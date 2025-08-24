@@ -157,6 +157,18 @@ st.markdown("""
     margin-top: auto;         /* push it to bottom naturally */
 }
 
+/* Make sure page uses flex layout so footer stays at bottom naturally */
+.main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.block-container {
+    flex: 1 0 auto;   /* content takes available space */
+}
+
+
 
 
 </style>
@@ -318,6 +330,7 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
 
 
