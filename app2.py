@@ -11,10 +11,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
 st.markdown("""
 <style>
-/* === DiagnoX AI - Sovereign Dark Gold v3.0 === */
+/* === DiagnoX AI - Sovereign Dark Gold (Lite) === */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 :root {
@@ -34,139 +33,85 @@ st.markdown("""
     --font-family: 'Poppins', sans-serif;
 }
 
-/* === Animated Cosmic Gradient Background === */
+/* === Background Gradient (smooth only) === */
+.stApp {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, #0a0a0a, #141414, #1a1a1a, #0f0f0f);
+    background-size: 400% 400%;
+    animation: auroraShift 25s ease infinite;
+    color: var(--text-primary);
+}
 @keyframes auroraShift {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
 }
-.stApp {
-    font-family: var(--font-family);
-    background: linear-gradient(135deg, #0a0a0a, #141414, #1a1a1a, #0f0f0f);
-    background-size: 400% 400%;
-    animation: auroraShift 40s ease infinite;
-    color: var(--text-primary);
-    position: relative;
-    overflow: hidden;
-}
 
-/* === Floating Particles Animation === */
-@keyframes floatParticles {
-    from { transform: translateY(100vh) scale(0.3); opacity: 0.2; }
-    to { transform: translateY(-10vh) scale(1); opacity: 0.8; }
-}
-.stApp::before {
-    content: "";
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-image: radial-gradient(circle, rgba(212,175,55,0.15) 1px, transparent 1px);
-    background-size: 80px 80px;
-    animation: floatParticles 60s linear infinite;
-    opacity: 0.2;
-    pointer-events: none;
-}
-
-/* === Luxury Header === */
+/* === Header === */
 .app-header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2.5rem;
 }
 .app-header .title-icon {
-    font-size: 4rem;
+    font-size: 3.5rem;
     color: var(--primary-gold);
-    text-shadow: 0 0 25px var(--gold-glow), 0 0 60px var(--primary-gold);
-    animation: pulse 4s ease-in-out infinite;
-}
-@keyframes pulse {
-    0%,100% { text-shadow: 0 0 25px var(--gold-glow), 0 0 40px var(--primary-gold); }
-    50% { text-shadow: 0 0 40px var(--gold-glow), 0 0 80px var(--gold-hover); }
+    text-shadow: 0 0 25px var(--gold-glow);
 }
 .app-header h1 {
-    font-size: 3.2rem;
+    font-size: 2.8rem;
     font-weight: 700;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.3rem;
     background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .app-header p {
-    font-size: 1.15rem;
+    font-size: 1.05rem;
     color: var(--text-secondary);
-    max-width: 650px;
+    max-width: 620px;
     margin: 0 auto;
-    font-weight: 300;
-    line-height: 1.6;
 }
 
-/* === Feature Cards === */
-.feature-card {
+/* === Cards === */
+.feature-card, .input-card, .result-container {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 18px;
     padding: 1.5rem;
-    text-align: center;
-    transition: all 0.4s ease;
-    backdrop-filter: blur(15px);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s ease;
 }
-.feature-card:hover {
-    transform: translateY(-8px);
+.feature-card:hover, .input-card:hover, .result-container:hover {
     border-color: var(--primary-gold);
-    box-shadow: 0 0 25px rgba(212,175,55,0.25);
+    box-shadow: 0 0 25px var(--gold-glow);
 }
 .feature-icon {
-    font-size: 2.2rem;
+    font-size: 2rem;
     color: var(--primary-gold);
     margin-bottom: 0.5rem;
 }
 
-/* === Input Card === */
-.input-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 2.2rem;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-    transition: all 0.3s ease;
-}
-.input-card:hover {
-    border-color: var(--gold-hover);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px var(--gold-glow);
-}
-
 /* === Predict Button === */
 .stButton>button {
-    font-family: var(--font-family);
     background: linear-gradient(135deg, var(--primary-gold), var(--gold-hover));
     color: #111;
     font-weight: 600;
-    font-size: 1.15rem;
-    padding: 1rem 2rem;
-    border-radius: 14px;
+    font-size: 1.1rem;
+    padding: 0.9rem 2rem;
+    border-radius: 12px;
     border: none;
     width: 100%;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     box-shadow: 0 6px 20px var(--gold-glow);
 }
 .stButton>button:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 10px 30px var(--gold-glow), 0 0 20px var(--primary-gold);
-}
-.stButton>button:active {
-    transform: scale(0.96);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px var(--gold-glow);
 }
 
-/* === Result Card === */
-.result-container {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 20px;
-    padding: 2rem;
-    backdrop-filter: blur(20px);
-    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-}
+/* === Result === */
 #predicted-disease {
-    font-size: 2.5rem;
+    font-size: 2.3rem;
     font-weight: 700;
     background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover));
     -webkit-background-clip: text;
@@ -174,35 +119,21 @@ st.markdown("""
     margin-bottom: 1rem;
 }
 #suggestion-list li {
-    background: rgba(255,255,255,0.05);
     border-left: 3px solid var(--primary-gold);
-    padding: 0.9rem 1rem;
-    border-radius: 12px;
-    margin-bottom: 0.6rem;
-    color: var(--text-primary);
-    transition: transform 0.2s ease;
-}
-#suggestion-list li:hover {
-    transform: translateX(8px);
-    background: rgba(255,255,255,0.08);
+    padding: 0.8rem 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.5rem;
+    background: rgba(255,255,255,0.05);
 }
 
-/* === Disclaimer & Footer === */
+/* === Disclaimer === */
 .disclaimer {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: var(--text-secondary);
     text-align: center;
-    padding: 1rem;
     margin-top: 2rem;
-    border-radius: 12px;
+    padding: 1rem;
     border-top: 1px solid var(--card-border);
-    background: rgba(30, 30, 30, 0.6);
-}
-.footer {
-    text-align: center;
-    color: #777;
-    font-size: 0.85rem;
-    padding-top: 3rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -363,4 +294,5 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
