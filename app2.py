@@ -133,7 +133,7 @@ import pandas as pd
 import numpy as np
 
 # ✅ Page config
-st.set_page_config(page_title="DiagnoX AI | Health Predictor", page_icon="🩺", layout="wide")
+st.set_page_config(page_title="DiagnoX AI", page_icon="🩺", layout="wide")
 
 # ----------------------------
 # Load model and data
@@ -245,3 +245,4 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
