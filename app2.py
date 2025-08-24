@@ -361,6 +361,8 @@ def render_results():
             st.markdown("<div class='disclaimer-box'><strong>Disclaimer:</strong> DiagnoX AI provides preliminary insights and is not a substitute for professional medical diagnosis. Consult a qualified doctor for accurate health advice.</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
+import io
+
 def create_pdf_report(results):
     """Generates a PDF report from the analysis results."""
     pdf = PDF()
@@ -394,13 +396,11 @@ def create_pdf_report(results):
             pdf.multi_cell(0, 5, f" - {suggestion}")
         pdf.ln(3)
 
-    # ✅ Always return bytes (safe for fpdf and fpdf2)
-    pdf_bytes = pdf.output(dest="S")
-    if isinstance(pdf_bytes, str):   # old fpdf returns str
-        pdf_bytes = pdf_bytes.encode("latin-1")
-
-    return pdf_bytes
-
+    # ✅ Always get raw bytes from FPDF/fpdf2
+    pdf_bytes = pdf.output(dest="S").encode("latin-1") if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
+    
+    # ✅ Wrap in BytesIO so Streamlit recognizes it
+    return io.BytesIO(pdf_bytes).getvalue()
     
 def render_footer():
     """Renders the page footer."""
@@ -417,4 +417,5 @@ if __name__ == "__main__":
         st.info("👆 Begin by selecting your symptoms and severity above, then click 'Analyze' for your differential diagnosis.")
 
     render_footer()
+
 
