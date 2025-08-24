@@ -3,8 +3,7 @@ import pickle
 import pandas as pd
 import numpy as np
 
-# ✅ Page config
-st.set_page_config(page_title="DiagnoX AI | Health Predictor", page_icon="🩺", layout="wide")
+
 
 # --- Premium IntelliCare Celestial v6 Theme ---
 st.markdown("""
@@ -129,35 +128,40 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 import streamlit as st
+import pickle
 import pandas as pd
 import numpy as np
-import pickle
-import os
+
+# ✅ Page config
+st.set_page_config(page_title="DiagnoX AI | Health Predictor", page_icon="🩺", layout="wide")
 
 # ----------------------------
 # Load model and data
 # ----------------------------
 @st.cache_data
 def load_data():
+    # Load ML model
     try:
         with open("disease_predictor.pkl", "rb") as f:
             model = pickle.load(f)
-    except Exception as e:
-        st.error("Error loading model. Ensure 'disease_predictor.pkl' exists and is valid.")
+    except Exception:
+        st.error("❌ Error loading model. Ensure 'disease_predictor.pkl' exists and is valid.")
         st.stop()
 
+    # Load medications CSV
     try:
         medications_df = pd.read_csv("medications.csv")
     except Exception:
-        st.error("Error loading 'medications.csv'. Ensure the file exists in the app directory.")
+        st.error("❌ Error loading 'medications.csv'. Ensure the file exists in the app directory.")
         st.stop()
 
+    # Load training data (symptoms list)
     try:
         train_df = pd.read_csv("Training.csv")
         if "Unnamed: 133" in train_df.columns:
             train_df = train_df.drop("Unnamed: 133", axis=1)
     except Exception:
-        st.error("Error loading 'Training.csv'. Ensure the file exists in the app directory.")
+        st.error("❌ Error loading 'Training.csv'. Ensure the file exists in the app directory.")
         st.stop()
 
     symptoms = train_df.drop("prognosis", axis=1).columns.tolist()
@@ -170,13 +174,11 @@ model, medications_df, symptoms = load_data()
 # ----------------------------
 # Streamlit UI
 # ----------------------------
-st.set_page_config(page_title="Diagnox AI | Health Predictor", layout="wide")
-
 st.markdown(
     """
-    <h1 style='text-align: center; color: #2C3E50;'>🩺 Diagnox AI | Health Predictor</h1>
-    <p style='text-align: center; color: gray;'>
-    Select your symptoms and get possible disease predictions with medication suggestions.
+    <h1 style='text-align: center; color: #FDB813;'>🩺 Diagnox AI | Health Predictor</h1>
+    <p style='text-align: center; color: #cbd5e1;'>
+    Select your symptoms and get possible disease predictions with medical suggestions.
     </p>
     """,
     unsafe_allow_html=True,
@@ -184,15 +186,27 @@ st.markdown(
 
 st.write("")
 
-# Sidebar for input
-st.sidebar.header("⚡ Input Symptoms")
-selected_symptoms = st.sidebar.multiselect(
-    "Choose symptoms you are experiencing:",
-    options=symptoms,
-    help="Start typing to search symptoms.",
-)
+# Centered Input Section
+with st.container():
+    st.markdown("<div style='display:flex; justify-content:center;'>", unsafe_allow_html=True)
+    col = st.columns([1,2,1])[1]  # center column
+    with col:
+        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+        st.subheader("⚡ Input Symptoms")
+        selected_symptoms = st.multiselect(
+            "Choose symptoms you are experiencing:",
+            options=symptoms,
+            help="Start typing to search symptoms.",
+        )
 
-if st.sidebar.button("🔍 Predict"):
+        predict_btn = st.button("🔍 Predict", use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ----------------------------
+# Prediction Logic
+# ----------------------------
+if predict_btn:
     if not selected_symptoms:
         st.warning("⚠️ Please select at least one symptom before predicting.")
     else:
@@ -207,21 +221,21 @@ if st.sidebar.button("🔍 Predict"):
             prediction = model.predict(input_data)[0]
             st.success(f"✅ Predicted Disease: **{prediction}**")
 
-            # Medication suggestions
-            meds = medications_df[medications_df["Disease"] == prediction]["Suggestion"].tolist()
-            if meds:
-                st.subheader("💊 Suggested Medications:")
-                for med in meds:
-                    st.write(f"- {med}")
+            # ✅ Match with Disease column in medications.csv
+            suggestion = medications_df[medications_df["Disease"].str.lower() == prediction.lower()]["Suggestion"].tolist()
+
+            if suggestion:
+                st.subheader("💊 Suggested Medications / Advice:")
+                for s in suggestion:
+                    st.write(f"- {s}")
             else:
-                st.info("No medication suggestions found for this disease.")
+                st.info("No suggestions found for this disease in medications.csv.")
 
         except Exception as e:
             st.error(f"Prediction error: {str(e)}")
 
 else:
-    st.info("👈 Select symptoms from the sidebar and click **Predict**.")
-
+    st.info("👆 Select symptoms above and click **Predict**.")
 
 # Footer
 st.markdown(
@@ -231,4 +245,3 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-
