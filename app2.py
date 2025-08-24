@@ -144,6 +144,25 @@ st.markdown("""
     z-index: 999;
 }
 
+/* === Made With Line Footer === */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    text-align: center;
+    padding: 0.5rem 0;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--primary-gold, #D4AF37);
+    letter-spacing: 1px;
+
+    background: transparent;  /* or rgba(0,0,0,0.6) if you want strip */
+    border-top: 1px solid rgba(212, 175, 55, 0.4);
+}
+
+
 </style>
 """, unsafe_allow_html=True)
 # Load Model and Data
@@ -303,6 +322,7 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
 
 
