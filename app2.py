@@ -126,15 +126,24 @@ st.markdown("""
     background: rgba(255,255,255,0.05);
 }
 
-/* === Disclaimer === */
+/* === Footer === */
 .disclaimer {
     font-size: 0.85rem;
     color: var(--text-secondary);
-    text-align: center;
-    margin-top: 2rem;
+    text-align: center;         /* center text */
     padding: 1rem;
     border-top: 1px solid var(--card-border);
+    margin-top: 2rem;
+
+    position: fixed;            /* stick to bottom */
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(10,10,10,0.9);  /* subtle dark strip */
+    backdrop-filter: blur(6px);
+    z-index: 999;
 }
+
 </style>
 """, unsafe_allow_html=True)
 # Load Model and Data
@@ -294,5 +303,6 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
 
