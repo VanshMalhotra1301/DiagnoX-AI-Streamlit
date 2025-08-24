@@ -389,7 +389,8 @@ def create_pdf_report(results):
             pdf.multi_cell(0, 5, f" - {suggestion}")
         pdf.ln(3)
 
-    return pdf.output(dest='S').encode('latin-1')
+    return pdf.output(dest="S").encode("latin-1") if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
+
     
 def render_footer():
     """Renders the page footer."""
