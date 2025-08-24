@@ -129,20 +129,49 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
+import streamlit as st
+import pickle
+import pandas as pd
+import numpy as np
+import os
+
+# ✅ Page config
+st.set_page_config(page_title="DiagnoX AI | Health Predictor", page_icon="🩺", layout="wide")
+
+# --- IntelliCare Theme CSS ---
+st.markdown(""" ... (your CSS unchanged) ... """, unsafe_allow_html=True)
+
 
 @st.cache_data
 def load_data():
-    with open('disease_predictor.pkl', 'rb') as f:
-        model = pickle.load(f)
-    medications_df = pd.read_csv('medications.csv')
-    train_df = pd.read_csv('Training.csv')
-    if 'Unnamed: 133' in train_df.columns:
-        train_df = train_df.drop('Unnamed: 133', axis=1)
-    symptoms = train_df.drop('prognosis', axis=1).columns.tolist()
+    model, medications_df, symptoms = None, None, []
+
+    # --- Model ---
+    if os.path.exists("disease_predictor.pkl"):
+        with open("disease_predictor.pkl", "rb") as f:
+            model = pickle.load(f)
+    else:
+        st.error("❌ Missing file: `disease_predictor.pkl`")
+
+    # --- Medications ---
+    if os.path.exists("medications.csv"):
+        medications_df = pd.read_csv("medications.csv")
+    else:
+        st.error("❌ Missing file: `medications.csv`")
+
+    # --- Symptoms ---
+    if os.path.exists("Training.csv"):
+        train_df = pd.read_csv("Training.csv")
+        if "Unnamed: 133" in train_df.columns:
+            train_df = train_df.drop("Unnamed: 133", axis=1)
+        symptoms = train_df.drop("prognosis", axis=1).columns.tolist()
+    else:
+        st.error("❌ Missing file: `Training.csv`")
+
     return model, medications_df, symptoms
 
 
-# Load Data
+# --- Load Data ---
 model, medications_df, symptoms = load_data()
 
 # --- Header ---
@@ -155,45 +184,48 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- Symptom Selection ---
-st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-st.subheader("🔍 Select Your Symptoms")
-selected_symptoms = st.multiselect(
-    "Type to search and select your symptoms:",
-    options=symptoms,
-    placeholder="e.g. headache, fever..."
-)
-analyze_btn = st.button("🚀 Analyze Symptoms")
-st.markdown("</div>", unsafe_allow_html=True)
+if model and medications_df is not None and symptoms:
+    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.subheader("🔍 Select Your Symptoms")
+    selected_symptoms = st.multiselect(
+        "Type to search and select your symptoms:",
+        options=symptoms,
+        placeholder="e.g. headache, fever..."
+    )
+    analyze_btn = st.button("🚀 Analyze Symptoms")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# --- Results ---
-if analyze_btn:
-    if not selected_symptoms:
-        st.warning("⚠️ Please select at least one symptom.")
+    # --- Results ---
+    if analyze_btn:
+        if not selected_symptoms:
+            st.warning("⚠️ Please select at least one symptom.")
+        else:
+            input_data = np.zeros(len(symptoms))
+            for symptom in selected_symptoms:
+                if symptom in symptoms:
+                    input_data[symptoms.index(symptom)] = 1
+            prediction = model.predict(input_data.reshape(1, -1))[0]
+
+            suggestion_row = medications_df[
+                medications_df['Disease'].str.lower() == prediction.lower()
+            ]
+            suggestion = (
+                suggestion_row['Suggestion'].iloc[0]
+                if not suggestion_row.empty
+                else "Consult a doctor for advice."
+            )
+
+            # Display Result Card
+            st.markdown(f"""
+            <div class="result-card">
+                <div class="result-title">🧾 Potential Condition</div>
+                <div id="predicted-disease">{prediction}</div>
+                <div class="suggestion-title">💊 Recommended Action:</div>
+                <div id="suggestion">{suggestion}</div>
+                <div class="disclaimer">⚠️ This is not a medical diagnosis. Always consult a healthcare professional.</div>
+            </div>
+            """, unsafe_allow_html=True)
     else:
-        input_data = np.zeros(len(symptoms))
-        for symptom in selected_symptoms:
-            if symptom in symptoms:
-                input_data[symptoms.index(symptom)] = 1
-        prediction = model.predict(input_data.reshape(1, -1))[0]
-
-        suggestion_row = medications_df[
-            medications_df['Disease'].str.lower() == prediction.lower()
-        ]
-        suggestion = (
-            suggestion_row['Suggestion'].iloc[0]
-            if not suggestion_row.empty
-            else "Consult a doctor for advice."
-        )
-
-        # Display Result Card
-        st.markdown(f"""
-        <div class="result-card">
-            <div class="result-title">🧾 Potential Condition</div>
-            <div id="predicted-disease">{prediction}</div>
-            <div class="suggestion-title">💊 Recommended Action:</div>
-            <div id="suggestion">{suggestion}</div>
-            <div class="disclaimer">⚠️ This is not a medical diagnosis. Always consult a healthcare professional.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        st.info("👉 Select symptoms and click **Analyze Symptoms** to see results.")
 else:
-    st.info("👉 Select symptoms and click **Analyze Symptoms** to see results.")
+    st.stop()  # prevent execution if files not loaded
