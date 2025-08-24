@@ -3,11 +3,13 @@ import pickle
 import pandas as pd
 import numpy as np
 import time
+from datetime import datetime
+from fpdf import FPDF
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="DiagnoX AI | Advanced Symptom Analysis",
-    page_icon="🩺",
+    page_title="DiagnoX AI Pro | Differential Diagnosis Engine",
+    page_icon="🧬",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -19,387 +21,388 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap');
 
 :root {
-    --primary-gold: #D4AF37;
-    --gold-hover: #FFD700;
-    --gold-glow: rgba(212, 175, 55, 0.25);
-    --bg-dark-1: #0a0a0a;
-    --bg-dark-2: #141414;
-    --text-primary: #f0f0f0;
-    --text-secondary: #a0a0a0;
-    --card-bg: rgba(20, 20, 20, 0.75);
-    --card-border: rgba(212, 175, 55, 0.2);
+    --primary-gold: #FFD700;
+    --gold-hover: #FFEA70;
+    --gold-glow: rgba(255, 215, 0, 0.4);
+    --bg-dark-1: #050505;
+    --bg-dark-2: #0d0d0d;
+    --bg-dark-3: #1a1a1a;
+    --text-primary: #f5f5f5;
+    --text-secondary: #b5b5b5;
+    --card-bg: rgba(25, 25, 25, 0.85);
+    --card-border: rgba(255, 215, 0, 0.15);
     --font-family-main: 'Poppins', sans-serif;
     --font-family-mono: 'Roboto Mono', monospace;
+    --danger-red: #ff4b4b;
 }
 
-/* === Core App Styling === */
+/* 🌌 App Background */
 .stApp {
     font-family: var(--font-family-main);
-    background: linear-gradient(135deg, var(--bg-dark-1) 0%, #111 50%, var(--bg-dark-2) 100%);
+    background: radial-gradient(circle at top left, #111 0%, #000 30%, #0d0d0d 70%, #050505 100%);
+    background-attachment: fixed;
     color: var(--text-primary);
+    animation: bgPulse 12s infinite alternate;
+}
+@keyframes bgPulse {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
 }
 
-/* === Header === */
-.app-header {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-.app-header .title-icon {
-    font-size: 4rem;
-    color: var(--primary-gold);
-    text-shadow: 0 0 30px var(--gold-glow);
-    animation: pulse-icon 2s infinite ease-in-out;
-}
-@keyframes pulse-icon {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.1); }
-}
-.app-header h1 {
-    font-size: 3.2rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-.app-header p {
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    max-width: 650px;
-    margin: 0 auto;
-}
-
-/* === Cards (Features, Input, Results) === */
+/* ✨ Cards */
 .card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 20px;
+    border-radius: 22px;
     padding: 1.75rem;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    transition: all 0.3s ease;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    transition: all 0.35s ease;
 }
 .card:hover {
     border-color: var(--primary-gold);
-    box-shadow: 0 0 30px var(--gold-glow);
-    transform: translateY(-5px);
+    box-shadow: 0 0 35px var(--gold-glow);
+    transform: translateY(-7px) scale(1.02);
 }
 
-/* Feature Cards Specifics */
-.feature-icon {
-    font-size: 2.5rem;
-    color: var(--primary-gold);
-    margin-bottom: 0.75rem;
+/* 🌟 Header */
+.app-header { text-align: center; margin-bottom: 3rem; }
+.app-header .title-icon { 
+    font-size: 4.2rem; 
+    color: var(--primary-gold); 
+    text-shadow: 0 0 40px var(--gold-glow); 
+    animation: pulse-icon 2s infinite ease-in-out; 
 }
-.feature-title {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
+@keyframes pulse-icon { 
+    0%, 100% { transform: scale(1); filter: drop-shadow(0 0 8px var(--gold-glow)); } 
+    50% { transform: scale(1.15); filter: drop-shadow(0 0 18px var(--gold-glow)); } 
 }
-.feature-description {
-    font-size: 0.95rem;
-    color: var(--text-secondary);
+.app-header h1 { 
+    font-size: 3.4rem; 
+    font-weight: 700; 
+    margin-bottom: 0.5rem; 
+    background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover), var(--primary-gold)); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    background-size: 200% auto;
+    animation: shineText 6s linear infinite;
+}
+@keyframes shineText {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+}
+.app-header p { font-size: 1.15rem; color: var(--text-secondary); max-width: 650px; margin: 0 auto; }
+
+/* 📊 Result Section */
+.result-container { padding: 2rem; margin-top: 1rem; }
+.result-header { font-size: 1.2rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 0.7rem; }
+.suggestion-list li { 
+    border-left: 3px solid var(--primary-gold); 
+    padding: 0.9rem 1.2rem; 
+    border-radius: 12px; 
+    margin-bottom: 0.85rem; 
+    background: rgba(255, 255, 255, 0.06); 
+    transition: all 0.25s ease; 
+}
+.suggestion-list li:hover { background: rgba(255, 215, 0, 0.08); box-shadow: inset 0 0 12px rgba(255, 215, 0, 0.15); }
+
+.disclaimer-box { 
+    font-size: 0.9rem; 
+    color: var(--text-secondary); 
+    text-align: center; 
+    padding: 1rem; 
+    border-top: 1px solid var(--card-border); 
+    margin-top: 1.7rem; 
+    background: rgba(15,15,15,0.7); 
+    border-radius: 0 0 20px 20px; 
 }
 
-/* Input Card Specifics */
-.input-card h2 {
-    text-align: center;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-/* === Predict Button === */
-.stButton>button {
-    background: linear-gradient(135deg, var(--primary-gold), #B8860B);
-    color: #0a0a0a;
-    font-weight: 700;
-    font-size: 1.2rem;
-    padding: 1rem 2.5rem;
-    border-radius: 15px;
-    border: none;
-    width: 100%;
-    transition: all 0.3s ease;
-    box-shadow: 0 8px 25px var(--gold-glow);
-}
-.stButton>button:hover {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 12px 30px rgba(212, 175, 55, 0.4);
-}
-
-/* === Result Section === */
-.result-container {
-    padding: 2rem;
-    margin-top: 1rem;
-}
-.result-header {
-    font-size: 1.1rem;
-    font-weight: 400;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-}
-.predicted-disease-container {
-    font-family: var(--font-family-mono);
-    font-size: 2.5rem;
-    font-weight: 700;
-    background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 1rem;
-    min-height: 50px; /* Reserve space for typewriter */
-}
-.suggestion-list li {
-    border-left: 3px solid var(--primary-gold);
-    padding: 0.8rem 1rem;
-    border-radius: 10px;
-    margin-bottom: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-}
-.disclaimer-box {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    text-align: center;
+/* 🚨 Severity Warning */
+.severity-warning {
+    border: 1px solid var(--danger-red);
+    background: rgba(255, 75, 75, 0.15);
+    color: var(--danger-red);
     padding: 1rem;
-    border-top: 1px solid var(--card-border);
-    margin-top: 1.5rem;
-    background: rgba(10,10,10,0.5);
-    border-radius: 0 0 18px 18px;
+    border-radius: 12px;
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: 700;
+    box-shadow: 0 0 15px rgba(255, 75, 75, 0.3);
 }
 
-/* Confidence Gauge */
-.confidence-section { margin-top: 1rem; }
-.confidence-gauge {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    height: 25px;
+/* 📂 Expander */
+.st-emotion-cache-116h4er, .st-emotion-cache-p5msec {
     border: 1px solid var(--card-border);
+    border-radius: 16px;
+    background-color: rgba(20,20,20,0.6);
+    transition: border 0.3s ease;
 }
-.confidence-bar {
-    background: linear-gradient(90deg, #B8860B, var(--primary-gold));
-    height: 100%;
-    border-radius: 8px;
-    transition: width 1.5s ease-in-out;
-}
-.confidence-label {
-    text-align: right;
-    font-family: var(--font-family-mono);
-    font-size: 1.1rem;
-    margin-top: 0.5rem;
+.st-emotion-cache-116h4er:hover, .st-emotion-cache-p5msec:hover {
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 12px var(--gold-glow);
 }
 
-/* === Analysis "Thinking" Animation === */
-.thinking-container {
-    text-align: center;
-    padding: 2rem;
+/* ⚡ Footer */
+.footer { 
+    text-align: center; 
+    padding: 2rem 0 1rem 0; 
+    font-size: 0.95rem; 
+    color: var(--text-secondary); 
+    border-top: 1px solid var(--card-border); 
+    margin-top: 3rem; 
+    letter-spacing: 0.5px;
 }
-.thinking-text {
-    font-family: var(--font-family-mono);
-    color: var(--primary-gold);
-    margin-bottom: 1rem;
-}
-.loader {
-    width: 80px;
-    height: 80px;
-    border: 5px solid var(--card-border);
-    border-top-color: var(--primary-gold);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin: 0 auto 1rem auto;
-}
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* === Footer === */
-.footer {
-    text-align: center;
-    padding: 2rem 0 1rem 0;
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    border-top: 1px solid var(--card-border);
-    margin-top: 3rem;
-}
+.footer:hover { color: var(--primary-gold); transition: color 0.3s ease; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- Data Loading ---
+
+# --- Data Loading & Processing ---
 @st.cache_data
 def load_data():
-    """Loads model, medications, and symptoms list with robust error handling."""
+    """Loads all necessary data files with error handling."""
     try:
         with open("disease_predictor.pkl", "rb") as f:
             model = pickle.load(f)
         medications_df = pd.read_csv("medications.csv")
         train_df = pd.read_csv("Training.csv").drop(columns=["Unnamed: 133"], errors='ignore')
-        symptoms = sorted(train_df.drop("prognosis", axis=1).columns.tolist())
-        return model, medications_df, symptoms
+        symptoms_list = sorted(train_df.drop("prognosis", axis=1).columns.tolist())
+        return model, medications_df, symptoms_list
     except FileNotFoundError as e:
-        st.error(f"Fatal Error: A required file was not found: {e.filename}. The application cannot start.")
+        st.error(f"Fatal Error: A required file was not found: {e.filename}. Please ensure 'disease_predictor.pkl', 'medications.csv', and 'Training.csv' are in the same directory.")
         st.stop()
     except Exception as e:
         st.error(f"Fatal Error during data loading: {e}")
         st.stop()
 
-model, medications_df, symptoms = load_data()
+model, medications_df, symptoms_list = load_data()
+
+# Symptom Categorization for better UX
+symptom_categories = {
+    "General & Systemic": ['itching', 'chills', 'fatigue', 'lethargy', 'malaise', 'weight_loss', 'weight_gain', 'excessive_hunger', 'dehydration', 'sweating', 'fever'],
+    "Head & Neck": ['headache', 'dizziness', 'slurred_speech', 'sinus_pressure', 'runny_nose', 'congestion', 'sore_throat', 'stiff_neck', 'loss_of_smell', 'ulcers_on_tongue', 'patches_in_throat', 'enlarged_thyroid', 'puffy_face_and_eyes', 'swollen_lymph_nodes'],
+    "Eyes & Vision": ['blurred_and_distorted_vision', 'yellowing_of_eyes', 'redness_of_eyes', 'pain_behind_the_eyes', 'sunken_eyes', 'visual_disturbances'],
+    "Chest & Respiratory": ['chest_pain', 'breathlessness', 'cough', 'phlegm', 'mucoid_sputum', 'rusty_sputum', 'palpitations'],
+    "Abdominal & Digestive": ['stomach_pain', 'acidity', 'vomiting', 'nausea', 'indigestion', 'diarrhoea', 'constipation', 'abdominal_pain', 'belly_pain', 'passage_of_gases', 'bloody_stool', 'stomach_bleeding', 'distention_of_abdomen'],
+    "Skin & Joints": ['skin_rash', 'nodal_skin_eruptions', 'dischromic _patches', 'yellowish_skin', 'bruising', 'joint_pain', 'neck_pain', 'back_pain', 'knee_pain', 'hip_joint_pain', 'weakness_of_one_body_side', 'weakness_in_limbs', 'swelling_joints', 'movement_stiffness', 'swollen_legs', 'brittle_nails', 'skin_peeling', 'silver_like_dusting', 'small_dents_in_nails', 'inflammatory_nails'],
+    "Urinary & Genital": ['burning_micturition', 'spotting_ urination', 'dark_urine', 'yellow_urine', 'abnormal_menstruation', 'continuous_feel_of_urine'],
+    "Psychological & Mood": ['anxiety', 'mood_swings', 'depression', 'irritability', 'restlessness', 'lack_of_concentration', 'altered_sensorium', 'coma']
+}
 
 # --- Initialize Session State ---
-if 'prediction' not in st.session_state:
-    st.session_state.prediction = None
-    st.session_state.probability = None
-    st.session_state.suggestions = None
-    st.session_state.selected_symptoms = None
+if 'analysis_results' not in st.session_state:
+    st.session_state.analysis_results = None
 
-# --- Helper Functions ---
-def typewriter(text: str, speed: float):
-    """Displays text with a typewriter effect."""
-    container = st.empty()
-    displayed_text = ""
-    for char in text:
-        displayed_text += char
-        container.markdown(f"<span class='predicted-disease-container'>{displayed_text}▌</span>", unsafe_allow_html=True)
-        time.sleep(speed)
-    container.markdown(f"<span class='predicted-disease-container'>{displayed_text}</span>", unsafe_allow_html=True)
+# --- PDF Generation Class ---
+class PDF(FPDF):
+    """PDF generation class for creating the final report."""
+    def header(self):
+        self.set_font('Arial', 'B', 15)
+        self.cell(0, 10, 'DiagnoX AI Pro - Analysis Report', 0, 1, 'C')
+        self.ln(10)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Arial', 'I', 8)
+        self.cell(0, 10, f'Page {self.page_no()}', 0, 0, 'C')
+        self.cell(0, 10, f"Report Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", 0, 0, 'R')
+
+    def chapter_title(self, title):
+        self.set_font('Arial', 'B', 12)
+        self.cell(0, 10, title, 0, 1, 'L')
+        self.ln(4)
+
+    def chapter_body(self, body):
+        self.set_font('Arial', '', 11)
+        self.multi_cell(0, 5, body)
+        self.ln()
+
+    def add_diagnosis(self, diagnosis, probability):
+        self.set_font('Arial', 'B', 11)
+        self.cell(95, 8, f" {diagnosis}", 1, 0, 'L')
+        self.set_font('Arial', '', 11)
+        self.cell(95, 8, f"{probability*100:.2f}% Confidence", 1, 1, 'R')
 
 # --- UI Rendering Functions ---
-
 def render_header():
+    """Renders the main header of the application."""
     st.markdown("""
         <div class='app-header'>
-            <div class='title-icon'>🩺</div>
-            <h1>DiagnoX AI</h1>
-            <p>Your personal AI health companion for intelligent symptom analysis. Input your symptoms to receive instant, data-driven preliminary insights.</p>
+            <div class='title-icon'>🧬</div>
+            <h1>DiagnoX AI Pro</h1>
+            <p>Your advanced health companion for differential diagnosis. Select symptoms, specify severity, and receive a detailed analysis.</p>
         </div>
     """, unsafe_allow_html=True)
 
-def render_feature_cards():
-    cols = st.columns(3, gap="large")
-    features = [
-        {"icon": "✨", "title": "AI-Powered Analysis", "desc": "Leverages a sophisticated machine learning model to analyze your symptoms against a vast dataset of medical information."},
-        {"icon": "⚡️", "title": "Instant Results", "desc": "Receive immediate, potential health insights, including a confidence score, to help you understand possible conditions quickly."},
-        {"icon": "🧑‍⚕️", "title": "Actionable Guidance", "desc": "Provides relevant suggestions and next steps for the predicted condition, empowering you to make informed health decisions."}
-    ]
-    for i, col in enumerate(cols):
-        with col:
-            st.markdown(f"""
-            <div class="card feature-card">
-                <div class="feature-icon">{features[i]['icon']}</div>
-                <div class="feature-title">{features[i]['title']}</div>
-                <div class="feature-description">{features[i]['desc']}</div>
-            </div>
-            """, unsafe_allow_html=True)
-
 def render_input_form():
+    """Renders the input form for symptoms and severity."""
     st.markdown("<br>", unsafe_allow_html=True)
     main_cols = st.columns([1, 1.5, 1])
     with main_cols[1]:
         with st.container():
             st.markdown("<div class='card input-card'>", unsafe_allow_html=True)
             st.markdown("<h2>Symptom Analysis Engine</h2>", unsafe_allow_html=True)
-            selected_symptoms = st.multiselect(
-                label="Select the symptoms you are experiencing.",
-                options=symptoms,
-                help="Begin typing to search and select multiple symptoms.",
+
+            selected_symptoms = []
+            st.markdown("<h6>Select the symptoms you are experiencing:</h6>", unsafe_allow_html=True)
+            for category, symptoms_in_category in symptom_categories.items():
+                with st.expander(f"**{category}**"):
+                    valid_symptoms = [s for s in symptoms_in_category if s in symptoms_list]
+                    # THE FIX IS ON THE LINE BELOW: multilet -> multiselect
+                    selections = st.multiselect(f"Select from {category}", options=valid_symptoms, label_visibility="collapsed")
+                    selected_symptoms.extend(selections)
+            
+            st.markdown("<hr style='border-color: var(--card-border);'>", unsafe_allow_html=True)
+
+            st.markdown("<h6>Rate the overall severity of your symptoms:</h6>", unsafe_allow_html=True)
+            severity = st.select_slider(
+                "Severity",
+                options=['Mild', 'Moderate', 'Severe'],
+                value='Moderate',
                 label_visibility="collapsed"
             )
+
             st.write("") # Spacer
             if st.button("Analyze Symptoms", use_container_width=True):
                 if not selected_symptoms:
                     st.warning("⚠️ Please select at least one symptom for analysis.")
-                    st.session_state.prediction = None # Reset state
+                    st.session_state.analysis_results = None
                 else:
-                    # Show "thinking" animation
                     with st.spinner(''):
-                         st.markdown("""
-                            <div class="thinking-container">
-                                <div class="loader"></div>
-                                <div class="thinking-text">DIAGNOX AI IS ANALYZING...</div>
-                            </div>
-                        """, unsafe_allow_html=True)
-                         time.sleep(2) # Simulate processing time
+                        st.markdown("""<div style="text-align:center; color:var(--primary-gold); font-family:var(--font-family-mono);">DIAGNOX AI IS ANALYZING...</div>""", unsafe_allow_html=True)
+                        time.sleep(1.5)
 
-                    # Prepare input data for the model
-                    input_data = [0] * len(symptoms)
+                    input_data = [0] * len(symptoms_list)
                     for symptom in selected_symptoms:
-                        if symptom in symptoms:
-                            input_data[symptoms.index(symptom)] = 1
-                    
+                        if symptom in symptoms_list:
+                            input_data[symptoms_list.index(symptom)] = 1
                     input_data = np.array(input_data).reshape(1, -1)
 
-                    # --- Prediction Logic ---
                     try:
                         prediction_proba = model.predict_proba(input_data)[0]
-                        max_proba_index = np.argmax(prediction_proba)
+                        top3_indices = np.argsort(prediction_proba)[-3:][::-1]
                         
-                        st.session_state.prediction = model.classes_[max_proba_index]
-                        st.session_state.probability = prediction_proba[max_proba_index]
-                        st.session_state.selected_symptoms = selected_symptoms
+                        results = {
+                            "selected_symptoms": selected_symptoms,
+                            "severity": severity,
+                            "top_predictions": []
+                        }
 
-                        suggestion_row = medications_df[medications_df["Disease"].str.lower() == st.session_state.prediction.lower()]
-                        st.session_state.suggestions = suggestion_row["Suggestion"].tolist() if not suggestion_row.empty else []
-                        
-                        st.rerun() # Rerun to display results below
+                        for i in top3_indices:
+                            disease_name = model.classes_[i]
+                            probability = prediction_proba[i]
+                            suggestion_row = medications_df[medications_df["Disease"].str.lower() == disease_name.lower()]
+                            suggestions = suggestion_row["Suggestion"].tolist() if not suggestion_row.empty else ["Consult a healthcare professional for guidance."]
+                            
+                            results["top_predictions"].append({
+                                "disease": disease_name,
+                                "probability": probability,
+                                "suggestions": suggestions
+                            })
+                        st.session_state.analysis_results = results
+                        st.rerun()
 
                     except Exception as e:
                         st.error(f"An error occurred during prediction: {str(e)}")
-                        st.session_state.prediction = None # Reset state
-
+                        st.session_state.analysis_results = None
             st.markdown("</div>", unsafe_allow_html=True)
 
 def render_results():
-    if st.session_state.prediction:
+    """Renders the analysis results, chart, and download button."""
+    if st.session_state.analysis_results:
+        results = st.session_state.analysis_results
         st.markdown("---")
         result_cols = st.columns([0.5, 2, 0.5])
+
         with result_cols[1]:
             st.markdown("<div class='card result-container'>", unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center;'>Analysis Results</h2>", unsafe_allow_html=True)
             
-            res_layout = st.columns([1.2, 1])
+            if results['severity'] == 'Severe':
+                st.markdown("<div class='severity-warning'>❗️ Your symptoms are marked as severe. This analysis is not a substitute for professional medical advice. Please seek immediate medical attention.</div>", unsafe_allow_html=True)
+
+            res_layout = st.columns([1, 1.2])
             with res_layout[0]:
-                st.markdown("<div class='result-header'>Potential Condition</div>", unsafe_allow_html=True)
-                typewriter(st.session_state.prediction, 0.05)
-                
-                # Confidence Gauge
-                st.markdown("<div class='result-header confidence-section'>Confidence Score</div>", unsafe_allow_html=True)
-                st.markdown(f"""
-                    <div class='confidence-gauge'>
-                        <div class='confidence-bar' style='width: {st.session_state.probability*100:.2f}%;'></div>
-                    </div>
-                    <div class='confidence-label'>{st.session_state.probability*100:.2f}%</div>
-                """, unsafe_allow_html=True)
-
+                st.markdown("<div class='result-header'>Your Inputs</div>", unsafe_allow_html=True)
+                st.write(f"**Severity:** {results['severity']}")
+                st.write("**Selected Symptoms:**")
+                symptoms_str = ", ".join([s.replace('_', ' ').title() for s in results['selected_symptoms']])
+                st.info(symptoms_str)
+            
             with res_layout[1]:
-                st.markdown("<div class='result-header'>Recommended Actions</div>", unsafe_allow_html=True)
-                if st.session_state.suggestions:
-                    suggestion_html = "<ul class='suggestion-list'>"
-                    for s in st.session_state.suggestions:
-                        suggestion_html += f"<li>{s}</li>"
-                    suggestion_html += "</ul>"
-                    st.markdown(suggestion_html, unsafe_allow_html=True)
-                else:
-                    st.info("No specific actions found. Please consult a healthcare professional for guidance.")
+                st.markdown("<div class='result-header'>Differential Diagnosis</div>", unsafe_allow_html=True)
+                chart_data = pd.DataFrame({
+                    "Condition": [p['disease'] for p in results['top_predictions']],
+                    "Confidence": [p['probability'] for p in results['top_predictions']]
+                })
+                st.bar_chart(chart_data, x="Condition", y="Confidence")
 
-            st.markdown("<div class='disclaimer-box'><strong>Disclaimer:</strong> This is an AI-generated analysis and not a substitute for professional medical advice. Please consult a doctor for an accurate diagnosis.</div>", unsafe_allow_html=True)
+            st.markdown("<hr style='border-color: var(--card-border); margin-top:1rem; margin-bottom:1rem;'>", unsafe_allow_html=True)
+            
+            st.markdown("<div class='result-header'>Detailed Breakdown & Recommendations</div>", unsafe_allow_html=True)
+            for i, pred in enumerate(results['top_predictions']):
+                expander_title = f"**{i+1}. {pred['disease']}** ({pred['probability']*100:.1f}% confidence)"
+                with st.expander(expander_title, expanded=(i == 0)):
+                    st.markdown("<ul class='suggestion-list'>", unsafe_allow_html=True)
+                    for s in pred['suggestions']:
+                        st.markdown(f"<li>{s}</li>", unsafe_allow_html=True)
+                    st.markdown("</ul>", unsafe_allow_html=True)
+            
+            st.write("")
+            pdf_data = create_pdf_report(results)
+            st.download_button(
+                label="📥 Download Report as PDF",
+                data=pdf_data,
+                file_name=f"DiagnoX_Report_{datetime.now().strftime('%Y%m%d')}.pdf",
+                mime="application/pdf",
+                use_container_width=True
+            )
+            
+            st.markdown("<div class='disclaimer-box'><strong>Disclaimer:</strong> DiagnoX AI provides preliminary insights and is not a substitute for professional medical diagnosis. Consult a qualified doctor for accurate health advice.</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
 
-def render_footer():
-    st.markdown("""
-        <div class="footer">
-            DiagnoX AI &copy; 2025 | Developed with ❤️ by Vansh
-        </div>
-    """, unsafe_allow_html=True)
+def create_pdf_report(results):
+    """Generates a PDF report from the analysis results."""
+    pdf = PDF()
+    pdf.add_page()
+    
+    pdf.chapter_title("Patient Input Summary")
+    pdf.chapter_body(f"Symptom Severity: {results['severity']}\n"
+                     f"Selected Symptoms: {', '.join([s.replace('_', ' ').title() for s in results['selected_symptoms']])}")
 
+    if results['severity'] == 'Severe':
+        pdf.set_text_color(255, 0, 0)
+        pdf.chapter_body("WARNING: Symptoms were marked as SEVERE. It is highly recommended to seek immediate medical attention from a healthcare professional.")
+        pdf.set_text_color(0, 0, 0)
+        
+    pdf.chapter_title("Differential Diagnosis Results")
+    for i, pred in enumerate(results['top_predictions']):
+        pdf.add_diagnosis(f"{i+1}. {pred['disease']}", pred['probability'])
+    pdf.ln(5)
+
+    pdf.chapter_title("Detailed Recommendations")
+    for i, pred in enumerate(results['top_predictions']):
+        pdf.set_font('Arial', 'B', 11)
+        pdf.cell(0, 10, f"{i+1}. {pred['disease']}", 0, 1, 'L')
+        for suggestion in pred['suggestions']:
+            pdf.set_font('Arial', '', 11)
+            pdf.multi_cell(0, 5, f" - {suggestion}")
+        pdf.ln(3)
+
+    return pdf.output(dest='S').encode('latin-1')
+    
+def render_footer():
+    """Renders the page footer."""
+    st.markdown("<div class='footer'>DiagnoX AI Pro &copy; 2025 | Advanced Insights by Vansh</div>", unsafe_allow_html=True)
 
 # --- Main App Flow ---
-render_header()
-render_feature_cards()
-render_input_form()
+if __name__ == "__main__":
+    render_header()
+    render_input_form()
 
-# Display results if a prediction has been made
-if st.session_state.prediction:
-    render_results()
-else:
-    # Initial instruction text
-    st.info("👆 Begin by selecting your symptoms above and click 'Analyze Symptoms' to receive your preliminary health insights.")
+    if st.session_state.analysis_results:
+        render_results()
+    else:
+        st.info("👆 Begin by selecting your symptoms and severity above, then click 'Analyze' for your differential diagnosis.")
 
-render_footer()
+    render_footer()
