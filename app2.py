@@ -145,21 +145,18 @@ st.markdown("""
 }
 
 /* === Made With Line Footer === */
+/* Footer at the very end of the page (no extra gap) */
 .footer {
-        text-align: center;
+    text-align: center;
     padding: 1rem 0;
-
-    color: var(--primary-gold, #D4AF37);
-
-    margin-top: 2rem;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--primary-gold, #D4AF37);
     letter-spacing: 1px;
-
-    background: transparent;  /* or rgba(0,0,0,0.6) if you want strip */
     border-top: 1px solid rgba(212, 175, 55, 0.4);
+    margin-top: auto;         /* push it to bottom naturally */
 }
+
 
 
 </style>
@@ -321,6 +318,7 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
 
 
