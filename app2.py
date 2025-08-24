@@ -6,16 +6,16 @@ import numpy as np
 # --- Page Configuration ---
 # Set page config once at the beginning
 st.set_page_config(
-    page_title="DiagnoX AI",
+    page_title="DiagnoX AI | Advanced Symptom Analysis",
     page_icon="🩺",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
 
-# --- Sovereign Gold Theme by Aura Health ---
+# --- Sovereign Gold Theme for DiagnoX AI ---
 st.markdown("""
     <style>
-        /* === Aura Health - Sovereign Gold v1.0 === */
+        /* === DiagnoX AI - Sovereign Gold v2.0 === */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
 
         :root {
@@ -35,17 +35,26 @@ st.markdown("""
             --font-family: 'Inter', sans-serif;
         }
 
+        /* --- Keyframe Animation for Background --- */
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
         /* --- General Body & App Styling --- */
         body, .stApp {
             font-family: var(--font-family);
-            background-image: radial-gradient(circle at top right, var(--bg-main-start), var(--bg-main-end) 80%);
+            background: linear-gradient(-45deg, #0a0a0a, #1a1a1a, #0d1117, #000000);
+            background-size: 400% 400%;
+            animation: gradientAnimation 20s ease infinite;
             color: var(--text-primary);
         }
 
         /* --- Custom Header --- */
         .app-header {
             text-align: center;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
         }
         .app-header .title-icon {
             font-size: 4rem;
@@ -65,6 +74,42 @@ st.markdown("""
             max-width: 600px;
             margin: 0 auto;
             font-weight: 300;
+        }
+        
+        /* --- NEW: Features Section --- */
+        .features-section {
+            padding: 2rem 0;
+            margin-bottom: 3rem;
+        }
+        .feature-card {
+            background: rgba(20, 20, 20, 0.3); /* Lighter than main card */
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            height: 100%; /* For equal height columns */
+        }
+        .feature-card:hover {
+            transform: translateY(-5px);
+            background: var(--card-bg);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
+        .feature-icon {
+            font-size: 2.5rem;
+            color: var(--primary-gold);
+        }
+        .feature-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 1rem 0 0.5rem 0;
+            color: var(--text-primary);
+        }
+        .feature-description {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.6;
         }
 
         /* --- Input Card --- */
@@ -203,12 +248,44 @@ st.markdown(
     """
     <div class='app-header'>
         <div class='title-icon'>🩺</div>
-        <h1>Diagnox AI</h1>
+        <h1>DiagnoX AI</h1>
         <p>Your personal AI health companion for intelligent symptom analysis and preliminary insights.</p>
     </div>
     """,
     unsafe_allow_html=True
 )
+
+# ----------------------------
+# NEW: Features Section
+# ----------------------------
+st.markdown("<div class='features-section'>", unsafe_allow_html=True)
+cols = st.columns(3, gap="large")
+with cols[0]:
+    st.markdown("""
+    <div class="feature-card">
+        <div class="feature-icon">✨</div>
+        <div class="feature-title">AI-Powered Analysis</div>
+        <div class="feature-description">Leverages a sophisticated machine learning model to analyze your symptoms against a vast dataset of medical information.</div>
+    </div>
+    """, unsafe_allow_html=True)
+with cols[1]:
+    st.markdown("""
+    <div class="feature-card">
+        <div class="feature-icon">⚡️</div>
+        <div class="feature-title">Instant Results</div>
+        <div class="feature-description">Receive immediate, potential health insights based on the symptoms you provide, helping you understand possible conditions quickly.</div>
+    </div>
+    """, unsafe_allow_html=True)
+with cols[2]:
+    st.markdown("""
+    <div class="feature-card">
+        <div class="feature-icon">🧑‍⚕️</div>
+        <div class="feature-title">Actionable Guidance</div>
+        <div class="feature-description">Provides relevant suggestions and next steps for the predicted condition, empowering you to make informed health decisions.</div>
+    </div>
+    """, unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
+
 
 # ----------------------------
 # Input Section
@@ -287,7 +364,4 @@ else:
 # ----------------------------
 # Footer
 # ----------------------------
-st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Developed by Vansh</p>", unsafe_allow_html=True)
-
-
-
+st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
