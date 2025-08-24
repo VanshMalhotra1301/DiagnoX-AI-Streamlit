@@ -176,7 +176,7 @@ model, medications_df, symptoms = load_data()
 # ----------------------------
 st.markdown(
     """
-    <h1 style='text-align: center; color: #FDB813;'>🩺 Diagnox AI | Health Predictor</h1>
+    <h1 style='text-align: center; color: #FDB813;'>🩺 Diagnox AI</h1>
     <p style='text-align: center; color: #cbd5e1;'>
     Select your symptoms and get possible disease predictions with medical suggestions.
     </p>
@@ -245,4 +245,5 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
 
