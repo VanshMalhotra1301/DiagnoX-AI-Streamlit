@@ -7,7 +7,7 @@ import numpy as np
 # Set page config once at the beginning
 st.set_page_config(
     page_title="DiagnoX AI",
-    page_icon="⚜️",
+    page_icon="🩺",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
@@ -288,3 +288,4 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Developed by Vansh</p>", unsafe_allow_html=True)
+
