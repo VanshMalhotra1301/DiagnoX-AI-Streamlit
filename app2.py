@@ -202,7 +202,7 @@ model, medications_df, symptoms = load_data()
 st.markdown(
     """
     <div class='app-header'>
-        <div class='title-icon'>⚜️</div>
+        <div class='title-icon'>⚜🩺</div>
         <h1>Diagnox AI</h1>
         <p>Your personal AI health companion for intelligent symptom analysis and preliminary insights.</p>
     </div>
@@ -288,4 +288,5 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Developed by Vansh</p>", unsafe_allow_html=True)
+
 
