@@ -208,7 +208,7 @@ if st.sidebar.button("🔍 Predict"):
             st.success(f"✅ Predicted Disease: **{prediction}**")
 
             # Medication suggestions
-            meds = medications_df[medications_df["disease"] == prediction]["medication"].tolist()
+            meds = medications_df[medications_df["Disease"] == prediction]["Suggestion"].tolist()
             if meds:
                 st.subheader("💊 Suggested Medications:")
                 for med in meds:
@@ -231,3 +231,4 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
+
