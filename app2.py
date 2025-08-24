@@ -367,12 +367,17 @@ def create_pdf_report(results):
     pdf.add_page()
     
     pdf.chapter_title("Patient Input Summary")
-    pdf.chapter_body(f"Symptom Severity: {results['severity']}\n"
-                     f"Selected Symptoms: {', '.join([s.replace('_', ' ').title() for s in results['selected_symptoms']])}")
+    pdf.chapter_body(
+        f"Symptom Severity: {results['severity']}\n"
+        f"Selected Symptoms: {', '.join([s.replace('_', ' ').title() for s in results['selected_symptoms']])}"
+    )
 
     if results['severity'] == 'Severe':
         pdf.set_text_color(255, 0, 0)
-        pdf.chapter_body("WARNING: Symptoms were marked as SEVERE. It is highly recommended to seek immediate medical attention from a healthcare professional.")
+        pdf.chapter_body(
+            "⚠️ WARNING: Symptoms were marked as SEVERE. "
+            "It is highly recommended to seek immediate medical attention from a healthcare professional."
+        )
         pdf.set_text_color(0, 0, 0)
         
     pdf.chapter_title("Differential Diagnosis Results")
@@ -389,7 +394,12 @@ def create_pdf_report(results):
             pdf.multi_cell(0, 5, f" - {suggestion}")
         pdf.ln(3)
 
-    return pdf.output(dest="S").encode("latin-1") if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
+    # ✅ Always return bytes (safe for fpdf and fpdf2)
+    pdf_bytes = pdf.output(dest="S")
+    if isinstance(pdf_bytes, str):   # old fpdf returns str
+        pdf_bytes = pdf_bytes.encode("latin-1")
+
+    return pdf_bytes
 
     
 def render_footer():
@@ -407,3 +417,4 @@ if __name__ == "__main__":
         st.info("👆 Begin by selecting your symptoms and severity above, then click 'Analyze' for your differential diagnosis.")
 
     render_footer()
+
