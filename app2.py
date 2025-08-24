@@ -13,134 +13,148 @@ st.set_page_config(
 
 # --- NEW: Celestial Light Theme ---
 st.markdown("""
-    <style>
-        /* === DiagnoX AI - Celestial Light v1.0 === */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+<style>
+/* === DiagnoX AI - Ultra Luxury Celestial Light v2.0 === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
 
-        :root {
-            --primary-accent: #007AFF;    /* Professional Blue */
-            --secondary-accent: #FF8C66; /* Soft Coral */
-            
-            --bg-color: #E0E5EC; /* Light, soft background */
-            
-            --text-primary: #2c3e50;
-            --text-secondary: #7f8c8d;
-            --font-family: 'Inter', sans-serif;
-        }
+:root {
+    --primary-accent: #6C63FF;   /* Vibrant Violet */
+    --secondary-accent: #FF7E5F; /* Lively Coral */
+    --tertiary-accent: #43E97B;  /* Neon Mint */
 
-        /* --- Animated Gradient Background (very subtle) --- */
-        @keyframes subtleAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    --bg-light: #F9FAFC;
+    --glass-bg: rgba(255, 255, 255, 0.6);
 
-        .stApp {
-            font-family: var(--font-family);
-            background: linear-gradient(-45deg, #F0F2F5, #E6E9EF, #F5F7FA, #E8F0F5);
-            background-size: 400% 400%;
-            animation: subtleAnimation 30s ease infinite;
-            color: var(--text-primary);
-        }
+    --text-primary: #1a1a1a;
+    --text-secondary: #555;
+    --font-family: 'Poppins', 'Inter', sans-serif;
+}
 
-        /* --- Header --- */
-        .app-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-        .app-header h1 {
-            font-size: 3.8rem;
-            font-weight: 700;
-            letter-spacing: -2px;
-            background: -webkit-linear-gradient(45deg, var(--primary-accent), #2c3e50);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 0.5rem;
-        }
-        .app-header p {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            max-width: 700px;
-            margin: 0 auto;
-            font-weight: 400;
-        }
-        
-        /* --- Neumorphic / Claymorphic Card Style --- */
-        .clay-card {
-            background: var(--bg-color);
-            border-radius: 30px;
-            padding: 2.5rem;
-            transition: all 0.4s ease;
-            height: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 
-                -10px -10px 20px rgba(255, 255, 255, 0.7), 
-                10px 10px 20px rgba(163, 177, 198, 0.6);
-        }
-        .clay-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 
-                -15px -15px 30px rgba(255, 255, 255, 0.8), 
-                15px 15px 30px rgba(163, 177, 198, 0.7);
-        }
+/* === Background with Animated Gradient Aurora === */
+@keyframes aurora {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.stApp {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg,
+        #f5f7fa,
+        #e4ecf7,
+        #fafcff,
+        #e6f0ff,
+        #fff9f5);
+    background-size: 400% 400%;
+    animation: aurora 40s ease infinite;
+    color: var(--text-primary);
+}
 
-        .card-header {
-            font-size: 1.8rem; font-weight: 600; margin-bottom: 2rem; text-align: center;
-        }
+/* === Luxury Header === */
+.app-header h1 {
+    font-size: 4rem;
+    font-weight: 700;
+    letter-spacing: -2px;
+    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent), var(--tertiary-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 4px 20px rgba(108, 99, 255, 0.2);
+}
+.app-header p {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    max-width: 720px;
+    margin: 0 auto;
+    opacity: 0.85;
+}
 
-        /* --- Button Style --- */
-        .stButton>button {
-            font-family: var(--font-family);
-            background: var(--primary-accent);
-            color: #FFFFFF; font-weight: 600; font-size: 1.1rem; padding: 1rem 2rem;
-            border-radius: 12px; border: none; width: 100%; cursor: pointer;
-            transition: all 0.3s ease-out;
-            box-shadow: 5px 5px 10px #bec8d2, -5px -5px 10px #fff;
-        }
-        .stButton>button:hover {
-            background: #0062CC;
-            box-shadow: 3px 3px 8px #bec8d2, -3px -3px 8px #fff;
-        }
-        .stButton>button:active {
-            transform: scale(0.98);
-            box-shadow: inset 2px 2px 5px #bec8d2, inset -2px -2px 5px #fff;
-        }
-        
-        /* --- Streamlit Multiselect Box Styling --- */
-        .stMultiSelect > div > div {
-            border-radius: 12px !important;
-            border: 1px solid rgba(0, 0, 0, 0.1) !important;
-            box-shadow: inset 2px 2px 5px #bec8d2, inset -2px -2px 5px #fff;
-            background-color: var(--bg-color);
-        }
+/* === Luxury Glass Cards === */
+.clay-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: 28px;
+    padding: 2.5rem;
+    border: 1px solid rgba(255,255,255,0.35);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08), 0 0 30px rgba(108, 99, 255, 0.12);
+    transition: all 0.4s ease;
+}
+.clay-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 18px 60px rgba(0,0,0,0.12), 0 0 40px rgba(108, 99, 255, 0.2);
+}
 
-        /* --- Result Display --- */
-        .result-header {
-            font-weight: 600; color: var(--text-secondary); text-transform: uppercase;
-            letter-spacing: 1px; font-size: 0.9rem; margin-bottom: 0.5rem; text-align: center;
-        }
-        #predicted-disease {
-            font-size: 2.6rem; font-weight: 700; text-align: center;
-            color: var(--primary-accent);
-            margin-bottom: 2rem;
-        }
-        #suggestion-list li {
-            background-color: #E8F0F5; padding: 1rem; border-radius: 12px;
-            margin-bottom: 0.75rem; border-left: 4px solid var(--secondary-accent);
-            font-weight: 400; line-height: 1.6;
-        }
+/* === Button Styling === */
+.stButton>button {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--primary-accent), var(--secondary-accent));
+    color: #fff; font-weight: 600; font-size: 1.15rem;
+    padding: 1rem 2rem; border-radius: 14px;
+    border: none; cursor: pointer; width: 100%;
+    transition: all 0.3s ease-in-out;
+    box-shadow: 0 6px 20px rgba(108,99,255,0.3);
+}
+.stButton>button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 25px rgba(255,126,95,0.3);
+    background: linear-gradient(135deg, var(--secondary-accent), var(--tertiary-accent));
+}
+.stButton>button:active {
+    transform: scale(0.97);
+}
 
-        /* --- "How It Works" Section --- */
-        .info-section { padding: 2.5rem; margin-top: 2rem; }
-        .info-title { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.75rem; }
-        .info-icon { font-size: 2rem; margin-right: 1rem; vertical-align: middle; }
-        .info-text { color: var(--text-secondary); font-weight: 400; line-height: 1.7; }
+/* === Multiselect Box Luxury === */
+.stMultiSelect > div > div {
+    border-radius: 14px !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    background: rgba(255,255,255,0.8);
+    box-shadow: inset 2px 2px 6px rgba(0,0,0,0.05),
+                inset -2px -2px 6px rgba(255,255,255,0.9);
+}
 
-        /* --- Footer --- */
-        .footer { text-align: center; color: #aaa; font-size: 0.9rem; padding-top: 5rem; }
-    </style>
+/* === Prediction Result === */
+#predicted-disease {
+    font-size: 2.8rem;
+    font-weight: 700;
+    text-align: center;
+    background: linear-gradient(90deg, var(--primary-accent), var(--secondary-accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2rem;
+    text-shadow: 0 6px 25px rgba(108, 99, 255, 0.2);
+}
+#suggestion-list li {
+    background: rgba(255,255,255,0.85);
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid var(--tertiary-accent);
+    font-weight: 500;
+    transition: transform 0.2s ease;
+}
+#suggestion-list li:hover {
+    transform: translateX(6px);
+    background: rgba(255,255,255,0.95);
+}
+
+/* === Info Section === */
+.info-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--primary-accent);
+}
+.info-text {
+    color: var(--text-secondary);
+    line-height: 1.75;
+}
+
+/* === Footer === */
+.footer {
+    text-align: center;
+    color: #888;
+    font-size: 0.95rem;
+    padding-top: 5rem;
+}
+</style>
 """, unsafe_allow_html=True)
-
 # ----------------------------
 # Load Model and Data
 # ----------------------------
@@ -259,3 +273,4 @@ st.markdown(
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Built by Vansh</p>", unsafe_allow_html=True)
+
