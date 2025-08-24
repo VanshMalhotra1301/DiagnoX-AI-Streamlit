@@ -5,15 +5,15 @@ import numpy as np
 import time
 from datetime import datetime
 from fpdf import FPDF
+import io
 
 # --- Page Configuration ---
 st.set_page_config(
-    page_title="DiagnoX AI Pro | Differential Diagnosis Engine",
+    page_title="DiagnoX AI Pro | Personalized Diagnosis Engine",
     page_icon="🧬",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
-
 # --- Enhanced CSS Styling ---
 st.markdown("""
 <style>
@@ -156,7 +156,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 # --- Data Loading & Processing ---
 @st.cache_data
 def load_data():
@@ -169,7 +168,7 @@ def load_data():
         symptoms_list = sorted(train_df.drop("prognosis", axis=1).columns.tolist())
         return model, medications_df, symptoms_list
     except FileNotFoundError as e:
-        st.error(f"Fatal Error: A required file was not found: {e.filename}. Please ensure 'disease_predictor.pkl', 'medications.csv', and 'Training.csv' are in the same directory.")
+        st.error(f"Fatal Error: A required file was not found: {e.filename}.")
         st.stop()
     except Exception as e:
         st.error(f"Fatal Error during data loading: {e}")
@@ -177,7 +176,6 @@ def load_data():
 
 model, medications_df, symptoms_list = load_data()
 
-# Symptom Categorization for better UX
 symptom_categories = {
     "General & Systemic": ['itching', 'chills', 'fatigue', 'lethargy', 'malaise', 'weight_loss', 'weight_gain', 'excessive_hunger', 'dehydration', 'sweating', 'fever'],
     "Head & Neck": ['headache', 'dizziness', 'slurred_speech', 'sinus_pressure', 'runny_nose', 'congestion', 'sore_throat', 'stiff_neck', 'loss_of_smell', 'ulcers_on_tongue', 'patches_in_throat', 'enlarged_thyroid', 'puffy_face_and_eyes', 'swollen_lymph_nodes'],
@@ -192,13 +190,21 @@ symptom_categories = {
 # --- Initialize Session State ---
 if 'analysis_results' not in st.session_state:
     st.session_state.analysis_results = None
+if 'history' not in st.session_state: # NEW: For analysis history
+    st.session_state.history = []
 
 # --- PDF Generation Class ---
 class PDF(FPDF):
     """PDF generation class for creating the final report."""
+    def __init__(self, name="User", age="N/A"): # NEW: Accept user details
+        super().__init__()
+        self.user_name = name
+        self.user_age = age
+
     def header(self):
         self.set_font('Arial', 'B', 15)
-        self.cell(0, 10, 'DiagnoX AI Pro - Analysis Report', 0, 1, 'C')
+        # NEW: Personalized title
+        self.cell(0, 10, f'DiagnoX AI Report for {self.user_name}', 0, 1, 'C')
         self.ln(10)
 
     def footer(self):
@@ -230,12 +236,12 @@ def render_header():
         <div class='app-header'>
             <div class='title-icon'>🧬</div>
             <h1>DiagnoX AI Pro</h1>
-            <p>Your advanced health companion for differential diagnosis. Select symptoms, specify severity, and receive a detailed analysis.</p>
+            <p>Your advanced health companion for differential diagnosis. Enter your details, select symptoms, and receive a personalized analysis.</p>
         </div>
     """, unsafe_allow_html=True)
 
 def render_input_form():
-    """Renders the input form for symptoms and severity."""
+    """Renders the input form for user details, symptoms and severity."""
     st.markdown("<br>", unsafe_allow_html=True)
     main_cols = st.columns([1, 1.5, 1])
     with main_cols[1]:
@@ -243,33 +249,40 @@ def render_input_form():
             st.markdown("<div class='card input-card'>", unsafe_allow_html=True)
             st.markdown("<h2>Symptom Analysis Engine</h2>", unsafe_allow_html=True)
 
+            # NEW: User Details Section
+            st.markdown("<h6>Enter Your Details:</h6>", unsafe_allow_html=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                user_name = st.text_input("Name", placeholder="e.g., John Doe")
+            with col2:
+                user_age = st.number_input("Age", min_value=0, max_value=120, step=1, format="%d")
+
+            st.markdown("<hr style='border-color: var(--card-border);'>", unsafe_allow_html=True)
+
             selected_symptoms = []
             st.markdown("<h6>Select the symptoms you are experiencing:</h6>", unsafe_allow_html=True)
             for category, symptoms_in_category in symptom_categories.items():
                 with st.expander(f"**{category}**"):
                     valid_symptoms = [s for s in symptoms_in_category if s in symptoms_list]
-                    # THE FIX IS ON THE LINE BELOW: multilet -> multiselect
                     selections = st.multiselect(f"Select from {category}", options=valid_symptoms, label_visibility="collapsed")
                     selected_symptoms.extend(selections)
             
             st.markdown("<hr style='border-color: var(--card-border);'>", unsafe_allow_html=True)
 
             st.markdown("<h6>Rate the overall severity of your symptoms:</h6>", unsafe_allow_html=True)
-            severity = st.select_slider(
-                "Severity",
-                options=['Mild', 'Moderate', 'Severe'],
-                value='Moderate',
-                label_visibility="collapsed"
-            )
+            severity = st.select_slider("Severity", options=['Mild', 'Moderate', 'Severe'], value='Moderate', label_visibility="collapsed")
 
-            st.write("") # Spacer
+            st.write("")
             if st.button("Analyze Symptoms", use_container_width=True):
-                if not selected_symptoms:
+                # NEW: Validation for user details
+                if not user_name or user_age <= 0:
+                    st.warning("⚠️ Please enter a valid name and age.")
+                elif not selected_symptoms:
                     st.warning("⚠️ Please select at least one symptom for analysis.")
                     st.session_state.analysis_results = None
                 else:
                     with st.spinner(''):
-                        st.markdown("""<div style="text-align:center; color:var(--primary-gold); font-family:var(--font-family-mono);">DIAGNOX AI IS ANALYZING...</div>""", unsafe_allow_html=True)
+                        st.markdown("""<div style="text-align:center; color:var(--primary-gold);">DIAGNOX AI IS ANALYZING...</div>""", unsafe_allow_html=True)
                         time.sleep(1.5)
 
                     input_data = [0] * len(symptoms_list)
@@ -283,6 +296,8 @@ def render_input_form():
                         top3_indices = np.argsort(prediction_proba)[-3:][::-1]
                         
                         results = {
+                            "user_name": user_name, # NEW
+                            "user_age": user_age,   # NEW
                             "selected_symptoms": selected_symptoms,
                             "severity": severity,
                             "top_predictions": []
@@ -292,14 +307,19 @@ def render_input_form():
                             disease_name = model.classes_[i]
                             probability = prediction_proba[i]
                             suggestion_row = medications_df[medications_df["Disease"].str.lower() == disease_name.lower()]
-                            suggestions = suggestion_row["Suggestion"].tolist() if not suggestion_row.empty else ["Consult a healthcare professional for guidance."]
+                            suggestions = suggestion_row["Suggestion"].tolist() if not suggestion_row.empty else ["Consult a healthcare professional."]
                             
                             results["top_predictions"].append({
                                 "disease": disease_name,
                                 "probability": probability,
                                 "suggestions": suggestions
                             })
+                        
                         st.session_state.analysis_results = results
+                        # NEW: Add to history
+                        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        top_disease = results['top_predictions'][0]['disease']
+                        st.session_state.history.insert(0, f"{timestamp} - {top_disease}")
                         st.rerun()
 
                     except Exception as e:
@@ -316,7 +336,8 @@ def render_results():
 
         with result_cols[1]:
             st.markdown("<div class='card result-container'>", unsafe_allow_html=True)
-            st.markdown("<h2 style='text-align: center;'>Analysis Results</h2>", unsafe_allow_html=True)
+            # NEW: Personalized header
+            st.markdown(f"<h2 style='text-align: center;'>Analysis for {results['user_name']}</h2>", unsafe_allow_html=True)
             
             if results['severity'] == 'Severe':
                 st.markdown("<div class='severity-warning'>❗️ Your symptoms are marked as severe. This analysis is not a substitute for professional medical advice. Please seek immediate medical attention.</div>", unsafe_allow_html=True)
@@ -324,6 +345,9 @@ def render_results():
             res_layout = st.columns([1, 1.2])
             with res_layout[0]:
                 st.markdown("<div class='result-header'>Your Inputs</div>", unsafe_allow_html=True)
+                # NEW: Display user details
+                st.write(f"**Name:** {results['user_name']}")
+                st.write(f"**Age:** {results['user_age']}")
                 st.write(f"**Severity:** {results['severity']}")
                 st.write("**Selected Symptoms:**")
                 symptoms_str = ", ".join([s.replace('_', ' ').title() for s in results['selected_symptoms']])
@@ -337,7 +361,7 @@ def render_results():
                 })
                 st.bar_chart(chart_data, x="Condition", y="Confidence")
 
-            st.markdown("<hr style='border-color: var(--card-border); margin-top:1rem; margin-bottom:1rem;'>", unsafe_allow_html=True)
+            st.markdown("<hr style='border-color: var(--card-border);'>", unsafe_allow_html=True)
             
             st.markdown("<div class='result-header'>Detailed Breakdown & Recommendations</div>", unsafe_allow_html=True)
             for i, pred in enumerate(results['top_predictions']):
@@ -353,33 +377,30 @@ def render_results():
             st.download_button(
                 label="📥 Download Report as PDF",
                 data=pdf_data,
-                file_name=f"DiagnoX_Report_{datetime.now().strftime('%Y%m%d')}.pdf",
+                file_name=f"DiagnoX_Report_{results['user_name'].replace(' ', '_')}.pdf",
                 mime="application/pdf",
                 use_container_width=True
             )
             
-            st.markdown("<div class='disclaimer-box'><strong>Disclaimer:</strong> DiagnoX AI provides preliminary insights and is not a substitute for professional medical diagnosis. Consult a qualified doctor for accurate health advice.</div>", unsafe_allow_html=True)
+            st.markdown("<div class='disclaimer-box'><strong>Disclaimer:</strong> This is an AI-generated insight and not a medical diagnosis. Consult a doctor for accurate health advice.</div>", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
-
-import io
 
 def create_pdf_report(results):
     """Generates a PDF report from the analysis results."""
-    pdf = PDF()
+    # NEW: Pass user details to PDF class
+    pdf = PDF(name=results['user_name'], age=results['user_age'])
     pdf.add_page()
     
     pdf.chapter_title("Patient Input Summary")
-    pdf.chapter_body(
-        f"Symptom Severity: {results['severity']}\n"
-        f"Selected Symptoms: {', '.join([s.replace('_', ' ').title() for s in results['selected_symptoms']])}"
-    )
+    # NEW: Include all user details in PDF body
+    pdf.chapter_body(f"Name: {results['user_name']}\n"
+                     f"Age: {results['user_age']}\n"
+                     f"Symptom Severity: {results['severity']}\n"
+                     f"Selected Symptoms: {', '.join([s.replace('_', ' ').title() for s in results['selected_symptoms']])}")
 
     if results['severity'] == 'Severe':
         pdf.set_text_color(255, 0, 0)
-        pdf.chapter_body(
-            "⚠️ WARNING: Symptoms were marked as SEVERE. "
-            "It is highly recommended to seek immediate medical attention from a healthcare professional."
-        )
+        pdf.chapter_body("⚠️ WARNING: Symptoms were marked as SEVERE. Seek immediate medical attention.")
         pdf.set_text_color(0, 0, 0)
         
     pdf.chapter_title("Differential Diagnosis Results")
@@ -396,10 +417,7 @@ def create_pdf_report(results):
             pdf.multi_cell(0, 5, f" - {suggestion}")
         pdf.ln(3)
 
-    # ✅ Always get raw bytes from FPDF/fpdf2
     pdf_bytes = pdf.output(dest="S").encode("latin-1") if isinstance(pdf.output(dest="S"), str) else pdf.output(dest="S")
-    
-    # ✅ Wrap in BytesIO so Streamlit recognizes it
     return io.BytesIO(pdf_bytes).getvalue()
     
 def render_footer():
@@ -408,14 +426,27 @@ def render_footer():
 
 # --- Main App Flow ---
 if __name__ == "__main__":
-    render_header()
-    render_input_form()
+    # NEW: Sidebar for history
+    with st.sidebar:
+        st.title("📜 Analysis Log")
+        if not st.session_state.history:
+            st.info("Your session analyses will be recorded here.")
+        for item in st.session_state.history:
+            st.success(item, icon="✅")
+        if st.session_state.history and st.button("Clear History"):
+            st.session_state.history = []
+            st.rerun()
 
+    render_header()
+    
+    # NEW: Conditional rendering of input vs results
     if st.session_state.analysis_results:
         render_results()
+        if st.button("⬅️ Start New Analysis"):
+            st.session_state.analysis_results = None
+            st.rerun()
     else:
-        st.info("👆 Begin by selecting your symptoms and severity above, then click 'Analyze' for your differential diagnosis.")
+        render_input_form()
+        st.info("👆 Begin by entering your details and symptoms above, then click 'Analyze' for your differential diagnosis.")
 
     render_footer()
-
-
