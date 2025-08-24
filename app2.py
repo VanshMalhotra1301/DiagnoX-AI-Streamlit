@@ -3,245 +3,288 @@ import pickle
 import pandas as pd
 import numpy as np
 
+# --- Page Configuration ---
+# Set page config once at the beginning
+st.set_page_config(
+    page_title="DiagnoX AI",
+    page_icon="⚜️",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
 
-
-# --- Premium IntelliCare Celestial v6 Theme ---
+# --- Sovereign Gold Theme by Aura Health ---
 st.markdown("""
     <style>
-        /* === IntelliCare Celestial v6 === */
+        /* === Aura Health - Sovereign Gold v1.0 === */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
         :root {
-            --primary-color: #FDB813;  
-            --primary-hover: #FFD700;  
-            --primary-glow: rgba(253, 184, 19, 0.15);
-            --secondary-accent: #4A90E2;
-            --bg-start: #0f172a; 
-            --bg-mid: #1e293b;  
-            --bg-end: #0c1322;
-            --card-bg: rgba(30, 41, 59, 0.7);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --text-primary: #f8fafc;
-            --text-secondary: #cbd5e1;
-            --text-accent: var(--primary-color);
-            --accent-warning: #F39C12;
-            --font-family: 'Inter', system-ui, sans-serif;
+            --primary-gold: #D4AF37; /* A rich, classic gold */
+            --primary-gold-hover: #E5C100; /* A brighter gold for interactions */
+            --primary-glow: rgba(212, 175, 55, 0.25);
+            
+            --bg-main-start: #1a1a1a; /* Deep charcoal */
+            --bg-main-end: #000000;   /* Pure black for depth */
+            
+            --card-bg: rgba(20, 20, 20, 0.6); /* Dark, semi-transparent card */
+            --card-border: rgba(212, 175, 55, 0.2); /* Subtle gold border */
+            --card-shadow: rgba(0, 0, 0, 0.5);
+            
+            --text-primary: #F0F0F0; /* Off-white for readability */
+            --text-secondary: #a0a0a0; /* Grey for subtitles and secondary info */
+            --font-family: 'Inter', sans-serif;
         }
 
+        /* --- General Body & App Styling --- */
         body, .stApp {
             font-family: var(--font-family);
-            background-image: linear-gradient(160deg, var(--bg-start) 10%, var(--bg-mid) 50%, var(--bg-end) 90%);
+            background-image: radial-gradient(circle at top right, var(--bg-main-start), var(--bg-main-end) 80%);
             color: var(--text-primary);
         }
 
-        /* Header */
+        /* --- Custom Header --- */
         .app-header {
             text-align: center;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
         }
-        .app-header .logo {
-            font-size: 3rem;
-            color: var(--primary-color);
-            text-shadow: 0 0 25px var(--primary-color);
+        .app-header .title-icon {
+            font-size: 4rem;
+            color: var(--primary-gold);
+            text-shadow: 0 0 30px var(--primary-glow), 0 0 50px var(--primary-gold);
         }
         .app-header h1 {
-            font-size: 2.75rem;
-            font-weight: 800;
-            background: linear-gradient(45deg, var(--text-primary), #bdc3c7);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
         .app-header p {
-            color: var(--text-secondary);
             font-size: 1.15rem;
-            line-height: 1.6;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+            font-weight: 300;
         }
 
-        /* Card */
-        .glass-card {
+        /* --- Input Card --- */
+        .input-card {
             background: var(--card-bg);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
             border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem 2.5rem;
+            box-shadow: 0 15px 30px var(--card-shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s ease;
             margin-bottom: 2rem;
         }
+        .input-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px var(--card-shadow), 0 0 15px var(--primary-glow);
+            border-color: rgba(212, 175, 55, 0.4);
+        }
 
-        /* Button */
+        /* --- Predict Button --- */
         .stButton>button {
-            background: var(--primary-color);
-            color: #0f172a;
+            font-family: var(--font-family);
+            background-image: linear-gradient(45deg, var(--primary-gold), var(--primary-gold-hover));
+            color: #101010;
             font-weight: 600;
             font-size: 1.1rem;
-            padding: 0.8rem 1.5rem;
+            padding: 0.9rem 2rem;
             border-radius: 12px;
             border: none;
             width: 100%;
             cursor: pointer;
+            transition: all 0.3s ease-out;
+            box-shadow: 0 5px 15px var(--primary-glow);
         }
         .stButton>button:hover {
-            background: var(--primary-hover);
-            box-shadow: 0 8px 15px var(--primary-glow);
+            transform: scale(1.03);
+            box-shadow: 0 8px 25px var(--primary-glow), 0 0 10px var(--primary-gold);
         }
 
-        /* Result Card */
-        .result-card {
-            padding: 1.5rem;
-            border-radius: 1.25rem;
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(14px);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-            margin-top: 1.5rem;
+        /* --- Result Display Card --- */
+        .result-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 30px var(--card-shadow);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
-        .result-title {
-            font-size: 0.9rem;
+        .result-header {
             font-weight: 600;
             color: var(--text-secondary);
             text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
         #predicted-disease {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 700;
-            color: var(--primary-color);
-            text-shadow: 0 0 20px var(--primary-glow);
-            margin: 1rem 0;
+            color: var(--primary-gold);
+            text-shadow: 0 0 15px var(--primary-glow);
         }
-        .suggestion-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
+        #suggestion-list {
+            list-style-type: none;
+            padding-left: 0;
         }
-        #suggestion {
-            font-size: 1.1rem;
+        #suggestion-list li {
+            background-color: rgba(255, 255, 255, 0.05);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid var(--primary-gold);
+            font-weight: 300;
             line-height: 1.6;
-            color: var(--text-primary);
         }
 
-        /* Disclaimer */
+        /* --- Disclaimer & Footer --- */
         .disclaimer {
-            margin-top: 1.5rem;
-            font-size: 0.85rem;
-            color: #fbbf24;
-            background: rgba(251, 191, 36, 0.1);
-            border-left: 3px solid #fbbf24;
-            padding: 0.75rem;
-            border-radius: 0.75rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-align: center;
+            background: rgba(30, 30, 30, 0.5);
+            padding: 1rem;
+            border-radius: 12px;
+            border-top: 1px solid var(--card-border);
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 0.8rem;
+            padding-top: 4rem;
         }
     </style>
 """, unsafe_allow_html=True)
-import streamlit as st
-import pickle
-import pandas as pd
-import numpy as np
-
-# ✅ Page config
-st.set_page_config(page_title="DiagnoX AI", page_icon="🩺", layout="wide")
 
 # ----------------------------
-# Load model and data
+# Load Model and Data
 # ----------------------------
 @st.cache_data
 def load_data():
-    # Load ML model
+    """Loads model, medications, and symptoms list with error handling."""
     try:
         with open("disease_predictor.pkl", "rb") as f:
             model = pickle.load(f)
-    except Exception:
-        st.error("❌ Error loading model. Ensure 'disease_predictor.pkl' exists and is valid.")
+    except FileNotFoundError:
+        st.error("Fatal Error: 'disease_predictor.pkl' not found. The application cannot start.")
+        st.stop()
+    except Exception as e:
+        st.error(f"Fatal Error loading model: {e}")
         st.stop()
 
-    # Load medications CSV
     try:
         medications_df = pd.read_csv("medications.csv")
-    except Exception:
-        st.error("❌ Error loading 'medications.csv'. Ensure the file exists in the app directory.")
+    except FileNotFoundError:
+        st.error("Fatal Error: 'medications.csv' not found. The application cannot start.")
         st.stop()
 
-    # Load training data (symptoms list)
     try:
-        train_df = pd.read_csv("Training.csv")
-        if "Unnamed: 133" in train_df.columns:
-            train_df = train_df.drop("Unnamed: 133", axis=1)
-    except Exception:
-        st.error("❌ Error loading 'Training.csv'. Ensure the file exists in the app directory.")
+        train_df = pd.read_csv("Training.csv").drop(columns=["Unnamed: 133"], errors='ignore')
+        symptoms = train_df.drop("prognosis", axis=1).columns.tolist()
+    except FileNotFoundError:
+        st.error("Fatal Error: 'Training.csv' not found. The application cannot start.")
         st.stop()
 
-    symptoms = train_df.drop("prognosis", axis=1).columns.tolist()
     return model, medications_df, symptoms
 
-
-# Load everything
+# Load all necessary data
 model, medications_df, symptoms = load_data()
 
 # ----------------------------
-# Streamlit UI
+# Header Section
 # ----------------------------
 st.markdown(
     """
-    <h1 style='text-align: center; color: #FDB813;'>🩺 Diagnox AI</h1>
-    <p style='text-align: center; color: #cbd5e1;'>
-    Select your symptoms and get possible disease predictions with medical suggestions.
-    </p>
+    <div class='app-header'>
+        <div class='title-icon'>⚜️</div>
+        <h1>Diagnox AI</h1>
+        <p>Your personal AI health companion for intelligent symptom analysis and preliminary insights.</p>
+    </div>
     """,
-    unsafe_allow_html=True,
+    unsafe_allow_html=True
 )
 
-st.write("")
-
-# Centered Input Section
-with st.container():
-    st.markdown("<div style='display:flex; justify-content:center;'>", unsafe_allow_html=True)
-    col = st.columns([1,2,1])[1]  # center column
-    with col:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.subheader("⚡ Input Symptoms")
+# ----------------------------
+# Input Section
+# ----------------------------
+main_cols = st.columns([1, 1.5, 1])
+with main_cols[1]: # Center column for input
+    with st.container():
+        st.markdown("<div class='input-card'>", unsafe_allow_html=True)
+        
+        st.markdown("<h2 style='text-align: center; font-weight: 600;'>Symptom Analysis</h2>", unsafe_allow_html=True)
         selected_symptoms = st.multiselect(
-            "Choose symptoms you are experiencing:",
+            label="Select the symptoms you are experiencing. You may choose multiple.",
             options=symptoms,
-            help="Start typing to search symptoms.",
+            help="Begin typing to search for a specific symptom.",
+            label_visibility="collapsed"
         )
-
-        predict_btn = st.button("🔍 Predict", use_container_width=True)
+        st.write("") # Spacer
+        predict_btn = st.button("Analyze Symptoms", use_container_width=True)
+        
         st.markdown("</div>", unsafe_allow_html=True)
-    st.markdown("</div>", unsafe_allow_html=True)
 
 # ----------------------------
-# Prediction Logic
+# Prediction & Output Logic
 # ----------------------------
 if predict_btn:
+    st.markdown("---")
     if not selected_symptoms:
-        st.warning("⚠ Please select at least one symptom before predicting.")
+        st.warning("⚠️ Please select at least one symptom for analysis.")
     else:
-        # Convert symptoms to input format
+        # Prepare input data for the model
         input_data = [0] * len(symptoms)
-        for s in selected_symptoms:
-            input_data[symptoms.index(s)] = 1
+        for symptom in selected_symptoms:
+            if symptom in symptoms:
+                input_data[symptoms.index(symptom)] = 1
+        
         input_data = np.array(input_data).reshape(1, -1)
 
-        # Predict
+        # Prediction and result display
         try:
             prediction = model.predict(input_data)[0]
-            st.success(f"✅ Predicted Disease: *{prediction}*")
+            
+            # Fetch suggestions from the medications dataframe
+            suggestion_row = medications_df[medications_df["Disease"].str.lower() == prediction.lower()]
+            suggestions = suggestion_row["Suggestion"].tolist() if not suggestion_row.empty else []
 
-            # ✅ Match with Disease column in medications.csv
-            suggestion = medications_df[medications_df["Disease"].str.lower() == prediction.lower()]["Suggestion"].tolist()
+            # Display results in the custom card
+            result_cols = st.columns([0.5, 2, 0.5])
+            with result_cols[1]:
+                st.markdown("<div class='result-container'>", unsafe_allow_html=True)
+                
+                res_layout = st.columns([1, 1])
+                with res_layout[0]:
+                    st.markdown("<div class='result-header'>Potential Condition</div>", unsafe_allow_html=True)
+                    st.markdown(f"<h3 id='predicted-disease'>{prediction}</h3>", unsafe_allow_html=True)
+                
+                with res_layout[1]:
+                    st.markdown("<div class='result-header'>Recommended Actions & Insights</div>", unsafe_allow_html=True)
+                    if suggestions:
+                        suggestion_html = "<ul id='suggestion-list'>"
+                        for s in suggestions:
+                           suggestion_html += f"<li>{s}</li>"
+                        suggestion_html += "</ul>"
+                        st.markdown(suggestion_html, unsafe_allow_html=True)
+                    else:
+                        st.info("No specific actions or medications found in our database for this condition. Please consult a healthcare professional.")
 
-            if suggestion:
-                st.subheader("💊 Suggested Medications / Advice:")
-                for s in suggestion:
-                    st.write(f"- {s}")
-            else:
-                st.info("No suggestions found for this disease in medications.csv.")
+                st.markdown("<br><div class='disclaimer'><strong>Disclaimer:</strong> This is an AI-generated analysis and not a substitute for professional medical advice. Please consult a doctor for an accurate diagnosis and treatment plan.</div>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
 
         except Exception as e:
-            st.error(f"Prediction error: {str(e)}")
-
+            st.error(f"An error occurred during prediction: {str(e)}")
 else:
-    st.info("👆 Select symptoms above and click *Predict*.")
+    # Initial instruction text
+    st.info("👆 Begin by selecting your symptoms in the card above and click 'Analyze Symptoms' to receive your preliminary health insights.")
 
+# ----------------------------
 # Footer
-st.markdown(
-    """
-    <hr>
-    <p style='text-align: center; color: gray;'>Built with ❤ By Vansh</p>
-    """,
-    unsafe_allow_html=True,
-)
+# ----------------------------
+st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Developed by Vansh</p>", unsafe_allow_html=True)
