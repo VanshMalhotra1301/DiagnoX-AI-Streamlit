@@ -249,7 +249,7 @@ with cols[2]:
         <div class="feature-description">Provides relevant suggestions and next steps for the predicted condition, empowering you to make informed health decisions.</div>
     </div>
     """, unsafe_allow_html=True)
-# st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
 
 # ----------------------------
@@ -330,6 +330,7 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
 
 
