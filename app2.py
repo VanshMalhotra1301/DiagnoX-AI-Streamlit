@@ -146,13 +146,12 @@ st.markdown("""
 
 /* === Made With Line Footer === */
 .footer {
-    position: fixed;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-    text-align: center;
-    padding: 0.5rem 0;
+        text-align: center;
+    padding: 1rem 0;
+
+    color: var(--primary-gold, #D4AF37);
+
+    margin-top: 2rem;
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--primary-gold, #D4AF37);
@@ -322,6 +321,7 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
 
 
 
