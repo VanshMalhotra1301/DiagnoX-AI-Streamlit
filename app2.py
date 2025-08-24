@@ -12,202 +12,200 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# --- Sovereign Gold Theme for DiagnoX AI ---
 st.markdown("""
-    <style>
-        /* === DiagnoX AI - Sovereign Gold v2.0 === */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+<style>
+/* === DiagnoX AI - Sovereign Dark Gold v3.0 === */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
-        :root {
-            --primary-gold: #D4AF37; /* A rich, classic gold */
-            --primary-gold-hover: #E5C100; /* A brighter gold for interactions */
-            --primary-glow: rgba(212, 175, 55, 0.25);
-            
-            --bg-main-start: #1a1a1a; /* Deep charcoal */
-            --bg-main-end: #000000;   /* Pure black for depth */
-            
-            --card-bg: rgba(20, 20, 20, 0.6); /* Dark, semi-transparent card */
-            --card-border: rgba(212, 175, 55, 0.2); /* Subtle gold border */
-            --card-shadow: rgba(0, 0, 0, 0.5);
-            
-            --text-primary: #F0F0F0; /* Off-white for readability */
-            --text-secondary: #a0a0a0; /* Grey for subtitles and secondary info */
-            --font-family: 'Inter', sans-serif;
-        }
+:root {
+    --primary-gold: #D4AF37;
+    --gold-hover: #FFD700;
+    --gold-glow: rgba(212, 175, 55, 0.25);
 
-        /* --- Keyframe Animation for Background --- */
-        @keyframes gradientAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
+    --bg-dark-1: #0a0a0a;
+    --bg-dark-2: #141414;
+    --bg-dark-3: #1a1a1a;
 
-        /* --- General Body & App Styling --- */
-        body, .stApp {
-            font-family: var(--font-family);
-            background: linear-gradient(-45deg, #0a0a0a, #1a1a1a, #0d1117, #000000);
-            background-size: 400% 400%;
-            animation: gradientAnimation 20s ease infinite;
-            color: var(--text-primary);
-        }
+    --card-bg: rgba(20, 20, 20, 0.65);
+    --card-border: rgba(212, 175, 55, 0.15);
 
-        /* --- Custom Header --- */
-        .app-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .app-header .title-icon {
-            font-size: 4rem;
-            color: var(--primary-gold);
-            text-shadow: 0 0 30px var(--primary-glow), 0 0 50px var(--primary-gold);
-        }
-        .app-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            letter-spacing: -1px;
-            color: var(--text-primary);
-            margin-bottom: 0.5rem;
-        }
-        .app-header p {
-            font-size: 1.15rem;
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto;
-            font-weight: 300;
-        }
-        
-        /* --- NEW: Features Section --- */
-        .features-section {
-            padding: 2rem 0;
-            margin-bottom: 3rem;
-        }
-        .feature-card {
-            background: rgba(20, 20, 20, 0.3); /* Lighter than main card */
-            border: 1px solid var(--card-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            text-align: center;
-            transition: all 0.3s ease;
-            height: 100%; /* For equal height columns */
-        }
-        .feature-card:hover {
-            transform: translateY(-5px);
-            background: var(--card-bg);
-            border-color: rgba(212, 175, 55, 0.4);
-        }
-        .feature-icon {
-            font-size: 2.5rem;
-            color: var(--primary-gold);
-        }
-        .feature-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 1rem 0 0.5rem 0;
-            color: var(--text-primary);
-        }
-        .feature-description {
-            font-size: 0.95rem;
-            color: var(--text-secondary);
-            font-weight: 300;
-            line-height: 1.6;
-        }
+    --text-primary: #f5f5f5;
+    --text-secondary: #999;
+    --font-family: 'Poppins', sans-serif;
+}
 
-        /* --- Input Card --- */
-        .input-card {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 2rem 2.5rem;
-            box-shadow: 0 15px 30px var(--card-shadow);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
-            margin-bottom: 2rem;
-        }
-        .input-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px var(--card-shadow), 0 0 15px var(--primary-glow);
-            border-color: rgba(212, 175, 55, 0.4);
-        }
+/* === Animated Cosmic Gradient Background === */
+@keyframes auroraShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+.stApp {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, #0a0a0a, #141414, #1a1a1a, #0f0f0f);
+    background-size: 400% 400%;
+    animation: auroraShift 40s ease infinite;
+    color: var(--text-primary);
+    position: relative;
+    overflow: hidden;
+}
 
-        /* --- Predict Button --- */
-        .stButton>button {
-            font-family: var(--font-family);
-            background-image: linear-gradient(45deg, var(--primary-gold), var(--primary-gold-hover));
-            color: #101010;
-            font-weight: 600;
-            font-size: 1.1rem;
-            padding: 0.9rem 2rem;
-            border-radius: 12px;
-            border: none;
-            width: 100%;
-            cursor: pointer;
-            transition: all 0.3s ease-out;
-            box-shadow: 0 5px 15px var(--primary-glow);
-        }
-        .stButton>button:hover {
-            transform: scale(1.03);
-            box-shadow: 0 8px 25px var(--primary-glow), 0 0 10px var(--primary-gold);
-        }
+/* === Floating Particles Animation === */
+@keyframes floatParticles {
+    from { transform: translateY(100vh) scale(0.3); opacity: 0.2; }
+    to { transform: translateY(-10vh) scale(1); opacity: 0.8; }
+}
+.stApp::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: radial-gradient(circle, rgba(212,175,55,0.15) 1px, transparent 1px);
+    background-size: 80px 80px;
+    animation: floatParticles 60s linear infinite;
+    opacity: 0.2;
+    pointer-events: none;
+}
 
-        /* --- Result Display Card --- */
-        .result-container {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 15px 30px var(--card-shadow);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-        .result-header {
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            font-size: 0.9rem;
-            margin-bottom: 0.5rem;
-        }
-        #predicted-disease {
-            font-size: 2.2rem;
-            font-weight: 700;
-            color: var(--primary-gold);
-            text-shadow: 0 0 15px var(--primary-glow);
-        }
-        #suggestion-list {
-            list-style-type: none;
-            padding-left: 0;
-        }
-        #suggestion-list li {
-            background-color: rgba(255, 255, 255, 0.05);
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 0.75rem;
-            border-left: 3px solid var(--primary-gold);
-            font-weight: 300;
-            line-height: 1.6;
-        }
+/* === Luxury Header === */
+.app-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.app-header .title-icon {
+    font-size: 4rem;
+    color: var(--primary-gold);
+    text-shadow: 0 0 25px var(--gold-glow), 0 0 60px var(--primary-gold);
+    animation: pulse 4s ease-in-out infinite;
+}
+@keyframes pulse {
+    0%,100% { text-shadow: 0 0 25px var(--gold-glow), 0 0 40px var(--primary-gold); }
+    50% { text-shadow: 0 0 40px var(--gold-glow), 0 0 80px var(--gold-hover); }
+}
+.app-header h1 {
+    font-size: 3.2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.app-header p {
+    font-size: 1.15rem;
+    color: var(--text-secondary);
+    max-width: 650px;
+    margin: 0 auto;
+    font-weight: 300;
+    line-height: 1.6;
+}
 
-        /* --- Disclaimer & Footer --- */
-        .disclaimer {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            text-align: center;
-            background: rgba(30, 30, 30, 0.5);
-            padding: 1rem;
-            border-radius: 12px;
-            border-top: 1px solid var(--card-border);
-        }
-        .footer {
-            text-align: center;
-            color: #666;
-            font-size: 0.8rem;
-            padding-top: 4rem;
-        }
-    </style>
+/* === Feature Cards === */
+.feature-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.4s ease;
+    backdrop-filter: blur(15px);
+}
+.feature-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--primary-gold);
+    box-shadow: 0 0 25px rgba(212,175,55,0.25);
+}
+.feature-icon {
+    font-size: 2.2rem;
+    color: var(--primary-gold);
+    margin-bottom: 0.5rem;
+}
+
+/* === Input Card === */
+.input-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2.2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+    transition: all 0.3s ease;
+}
+.input-card:hover {
+    border-color: var(--gold-hover);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 20px var(--gold-glow);
+}
+
+/* === Predict Button === */
+.stButton>button {
+    font-family: var(--font-family);
+    background: linear-gradient(135deg, var(--primary-gold), var(--gold-hover));
+    color: #111;
+    font-weight: 600;
+    font-size: 1.15rem;
+    padding: 1rem 2rem;
+    border-radius: 14px;
+    border: none;
+    width: 100%;
+    transition: all 0.3s ease;
+    box-shadow: 0 6px 20px var(--gold-glow);
+}
+.stButton>button:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 10px 30px var(--gold-glow), 0 0 20px var(--primary-gold);
+}
+.stButton>button:active {
+    transform: scale(0.96);
+}
+
+/* === Result Card === */
+.result-container {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 2rem;
+    backdrop-filter: blur(20px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+}
+#predicted-disease {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, var(--primary-gold), var(--gold-hover));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+}
+#suggestion-list li {
+    background: rgba(255,255,255,0.05);
+    border-left: 3px solid var(--primary-gold);
+    padding: 0.9rem 1rem;
+    border-radius: 12px;
+    margin-bottom: 0.6rem;
+    color: var(--text-primary);
+    transition: transform 0.2s ease;
+}
+#suggestion-list li:hover {
+    transform: translateX(8px);
+    background: rgba(255,255,255,0.08);
+}
+
+/* === Disclaimer & Footer === */
+.disclaimer {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+    border-radius: 12px;
+    border-top: 1px solid var(--card-border);
+    background: rgba(30, 30, 30, 0.6);
+}
+.footer {
+    text-align: center;
+    color: #777;
+    font-size: 0.85rem;
+    padding-top: 3rem;
+}
+</style>
 """, unsafe_allow_html=True)
-
-# ----------------------------
 # Load Model and Data
 # ----------------------------
 @st.cache_data
@@ -365,3 +363,4 @@ else:
 # Footer
 # ----------------------------
 st.markdown("<p class='footer'>DiagnoX AI &copy; 2025 | Made with ❤️ by Vansh</p>", unsafe_allow_html=True)
+
