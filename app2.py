@@ -128,104 +128,106 @@ st.markdown("""
         }
     </style>
 """, unsafe_allow_html=True)
-
 import streamlit as st
-import pickle
 import pandas as pd
 import numpy as np
+import pickle
 import os
 
-# ✅ Page config
-st.set_page_config(page_title="DiagnoX AI | Health Predictor", page_icon="🩺", layout="wide")
-
-# --- IntelliCare Theme CSS ---
-st.markdown(""" ... (your CSS unchanged) ... """, unsafe_allow_html=True)
-
-
+# ----------------------------
+# Load model and data
+# ----------------------------
 @st.cache_data
 def load_data():
-    model, medications_df, symptoms = None, None, []
-
-    # --- Model ---
-    if os.path.exists("disease_predictor.pkl"):
+    try:
         with open("disease_predictor.pkl", "rb") as f:
             model = pickle.load(f)
-    else:
-        st.error("❌ Missing file: `disease_predictor.pkl`")
+    except Exception as e:
+        st.error("Error loading model. Ensure 'disease_predictor.pkl' exists and is valid.")
+        st.stop()
 
-    # --- Medications ---
-    if os.path.exists("medications.csv"):
+    try:
         medications_df = pd.read_csv("medications.csv")
-    else:
-        st.error("❌ Missing file: `medications.csv`")
+    except Exception:
+        st.error("Error loading 'medications.csv'. Ensure the file exists in the app directory.")
+        st.stop()
 
-    # --- Symptoms ---
-    if os.path.exists("Training.csv"):
+    try:
         train_df = pd.read_csv("Training.csv")
         if "Unnamed: 133" in train_df.columns:
             train_df = train_df.drop("Unnamed: 133", axis=1)
-        symptoms = train_df.drop("prognosis", axis=1).columns.tolist()
-    else:
-        st.error("❌ Missing file: `Training.csv`")
+    except Exception:
+        st.error("Error loading 'Training.csv'. Ensure the file exists in the app directory.")
+        st.stop()
 
+    symptoms = train_df.drop("prognosis", axis=1).columns.tolist()
     return model, medications_df, symptoms
 
 
-# --- Load Data ---
+# Load everything
 model, medications_df, symptoms = load_data()
 
-# --- Header ---
-st.markdown("""
-<div class="app-header">
-    <div class="logo">🩺</div>
-    <h1>DiagnoX AI</h1>
-    <p>Predict potential health conditions with AI-powered insights.</p>
-</div>
-""", unsafe_allow_html=True)
+# ----------------------------
+# Streamlit UI
+# ----------------------------
+st.set_page_config(page_title="Diagnox AI | Health Predictor", layout="wide")
 
-# --- Symptom Selection ---
-if model and medications_df is not None and symptoms:
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.subheader("🔍 Select Your Symptoms")
-    selected_symptoms = st.multiselect(
-        "Type to search and select your symptoms:",
-        options=symptoms,
-        placeholder="e.g. headache, fever..."
-    )
-    analyze_btn = st.button("🚀 Analyze Symptoms")
-    st.markdown("</div>", unsafe_allow_html=True)
+st.markdown(
+    """
+    <h1 style='text-align: center; color: #2C3E50;'>🩺 Diagnox AI | Health Predictor</h1>
+    <p style='text-align: center; color: gray;'>
+    Select your symptoms and get possible disease predictions with medication suggestions.
+    </p>
+    """,
+    unsafe_allow_html=True,
+)
 
-    # --- Results ---
-    if analyze_btn:
-        if not selected_symptoms:
-            st.warning("⚠️ Please select at least one symptom.")
-        else:
-            input_data = np.zeros(len(symptoms))
-            for symptom in selected_symptoms:
-                if symptom in symptoms:
-                    input_data[symptoms.index(symptom)] = 1
-            prediction = model.predict(input_data.reshape(1, -1))[0]
+st.write("")
 
-            suggestion_row = medications_df[
-                medications_df['Disease'].str.lower() == prediction.lower()
-            ]
-            suggestion = (
-                suggestion_row['Suggestion'].iloc[0]
-                if not suggestion_row.empty
-                else "Consult a doctor for advice."
-            )
+# Sidebar for input
+st.sidebar.header("⚡ Input Symptoms")
+selected_symptoms = st.sidebar.multiselect(
+    "Choose symptoms you are experiencing:",
+    options=symptoms,
+    help="Start typing to search symptoms.",
+)
 
-            # Display Result Card
-            st.markdown(f"""
-            <div class="result-card">
-                <div class="result-title">🧾 Potential Condition</div>
-                <div id="predicted-disease">{prediction}</div>
-                <div class="suggestion-title">💊 Recommended Action:</div>
-                <div id="suggestion">{suggestion}</div>
-                <div class="disclaimer">⚠️ This is not a medical diagnosis. Always consult a healthcare professional.</div>
-            </div>
-            """, unsafe_allow_html=True)
+if st.sidebar.button("🔍 Predict"):
+    if not selected_symptoms:
+        st.warning("⚠️ Please select at least one symptom before predicting.")
     else:
-        st.info("👉 Select symptoms and click **Analyze Symptoms** to see results.")
+        # Convert symptoms to input format
+        input_data = [0] * len(symptoms)
+        for s in selected_symptoms:
+            input_data[symptoms.index(s)] = 1
+        input_data = np.array(input_data).reshape(1, -1)
+
+        # Predict
+        try:
+            prediction = model.predict(input_data)[0]
+            st.success(f"✅ Predicted Disease: **{prediction}**")
+
+            # Medication suggestions
+            meds = medications_df[medications_df["disease"] == prediction]["medication"].tolist()
+            if meds:
+                st.subheader("💊 Suggested Medications:")
+                for med in meds:
+                    st.write(f"- {med}")
+            else:
+                st.info("No medication suggestions found for this disease.")
+
+        except Exception as e:
+            st.error(f"Prediction error: {str(e)}")
+
 else:
-    st.stop()  # prevent execution if files not loaded
+    st.info("👈 Select symptoms from the sidebar and click **Predict**.")
+
+
+# Footer
+st.markdown(
+    """
+    <hr>
+    <p style='text-align: center; color: gray;'>Built with ❤️ By Vansh</p>
+    """,
+    unsafe_allow_html=True,
+)
